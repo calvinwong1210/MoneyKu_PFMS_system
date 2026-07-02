@@ -1,0 +1,287 @@
+/* --- Premium Landing Page Theme (Light Mode) --- */
+:root {
+    --primary: #10b981;
+    --primary-glow: rgba(16, 185, 129, 0.1); /* 浅色背景下降低炫光不透明度 */
+    --dark-bg: #F8FAFC;         /* 完美的浅蓝灰底色，告别纯白的单调 */
+    --card-bg: #ffffff;         /* 浅色模式下，卡片转为纯白 */
+    --card-border: #e2e8f0;     /* 使用细腻的浅灰边框取代半透明白 */
+    --text-main: #0f172a;       /* 主要文字改为深邃的蓝黑，确保清晰的可读性 */
+    --text-muted: #64748b;      /* 辅助文字 */
+}
+
+body.landing-body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 炫光背景氛围感 */
+body.landing-body::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+    top: -10%;
+    right: -10%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 8%;
+    background: rgba(248, 250, 252, 0.8); /* 改为浅色半透明毛玻璃 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.logo span {
+    color: var(--primary);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+}
+
+.nav-links .btn-login {
+    color: var(--text-main); /* 文字转为深色 */
+    background: #ffffff;     /* 登录按钮改为白色底 */
+    border: 1px solid var(--card-border);
+    padding: 10px 22px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-links .btn-login:hover {
+    color: #ffffff; /* 悬浮时变为白字 */
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 10px 20px var(--primary-glow);
+    transform: translateY(-2px);
+}
+
+/* --- Hero Section --- */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 100px 8%;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex-grow: 1;
+    z-index: 1;
+    gap: 40px;
+}
+
+.hero-content {
+    max-width: 600px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #059669; /* 浅色背景下微调绿色的纯度，提高对比度 */
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 28px;
+}
+
+.hero-content h1 {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+}
+
+.hero-content h1 span {
+    background: linear-gradient(to right, #059669, #10b981); /* 稍微加深渐变色 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-content p {
+    font-size: 18px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.cta-group {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #ffffff;
+    padding: 16px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25); /* 柔和浅色下的按钮投影 */
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35);
+}
+
+.btn-secondary {
+    background: #ffffff; /* 切换为纯白按钮 */
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 16px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* --- Hero Graphic Tilt Effect --- */
+.hero-graphic {
+    flex: 0 1 500px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.2s ease;
+    perspective: 1000px;
+}
+
+.hero-graphic svg {
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); /* 换用非常柔和的拟物化浅色阴影 */
+    border: 1px solid var(--card-border);
+    background: #ffffff; /* 如果内部图表也是 SVG，将其背景设为白色 */
+}
+
+/* --- Features Section Grid --- */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding: 100px 8%;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.005));
+    position: relative;
+    z-index: 1;
+}
+
+.feature-card {
+    padding: 40px;
+    border-radius: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); /* 初始化微弱阴影 */
+    opacity: 0; /* 配合JS动画初始化状态 */
+    transform: translateY(40px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 动效触发表（由 JavaScript 控制添加类名） */
+.feature-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.feature-card:hover {
+    background: #ffffff;
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.03); /* 优化的浅色悬浮阴影 */
+}
+
+.feature-icon {
+    font-size: 36px;
+    margin-bottom: 24px;
+    background: rgba(16, 185, 129, 0.08);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.feature-card p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* 响应式断点 */
+@media (max-width: 992px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 60px 5%;
+    }
+    .hero-content {
+        max-width: 100%;
+    }
+    .cta-group {
+        justify-content: center;
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+        padding: 60px 5%;
+        gap: 24px;
+    }
+}
