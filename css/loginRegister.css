@@ -10,6 +10,21 @@
     --primary-dark: #059669;    /* 补全原代码遗漏的按钮悬浮加深变量 */
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    margin-bottom: 24px;
+}
+
+/* 图片Logo特定控制类（高度限制防止撑开导航栏） */
+.logo-img {
+    height: 40px; 
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -48,7 +63,7 @@ body.auth-page::before {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    padding: 40px;
+    padding: 30px;
     border-radius: 24px;
     width: 100%;
     max-width: 420px;
@@ -234,3 +249,63 @@ h2 {
 .footer-text a:hover {
     text-decoration: underline;
 }
+
+.forgot-password {
+    text-align: right;
+    margin: -5px 0 20px;
+}
+
+.forgot-password a {
+    color: #10b981;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.forgot-password a:hover {
+    color: #059669;
+    text-decoration: underline;
+}
+
+/* --- Password Toggle Eye Icon --- */
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-muted);
+    user-select: none;
+    font-size: 18px; /* 稍微放大一点让图标更好看 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: var(--text-main);
+}
+
+.otp-group {
+    display: flex;
+    gap: 10px;
+}
+.otp-group input { flex: 1; }
+.btn-otp {
+    padding: 0 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-otp:disabled { background-color: #6c757d; cursor: not-allowed; }

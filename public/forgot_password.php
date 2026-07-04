@@ -1,5 +1,5 @@
 <?php
-// 引入 PHPMailer 核心文件 (请根据你的项目实际路径调整)
+// 引入 PHPMailer
 require_once '../PHPMailer/src/Exception.php';
 require_once '../PHPMailer/src/PHPMailer.php';
 require_once '../PHPMailer/src/SMTP.php';
@@ -7,15 +7,14 @@ require_once '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// 处理 AJAX 异步请求
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
     require_once '../config/db_config.php';
 
-    $action = $_POST['action'] ?? ''; // 判断是发验证码还是注册
+    $action = $_POST['action'] ?? '';
 
-    // ==================== 动作 1：发送 OTP ====================
-    if ($action === 'send_otp') {
+    // ==================== 1. 发送重置密码的 OTP ====================
+    if ($action === 'send_reset_otp') {
         $email = trim($_POST['email'] ?? '');
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -23,38 +22,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // 检查 Email 是否已被注册
+        // 检查 Email 是否存在于系统
         $check_sql = "SELECT user_id FROM users WHERE email = ?";
         $stmt = $conn->prepare($check_sql);
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            echo json_encode(["status" => "error", "message" => "Email already registered!"]);
+        if ($stmt->num_rows === 0) {
+            echo json_encode(["status" => "error", "message" => "Email address not found in our system!"]);
             $stmt->close();
             $conn->close();
             exit;
         }
         $stmt->close();
 
-        // 生成 6 位随机 OTP
+        // 生成 6 位 OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
         $expired_at = date("Y-m-d H:i:s", strtotime("+5 minutes"));
 
-        // 存入数据库
-        $action_type = 'register';
+        // 存入数据库，action_type 标记为 'reset'
+        $action_type = 'reset';
         $insert_otp_sql = "INSERT INTO user_otps (identifier, otp_code, action_type, expired_at) VALUES (?, ?, ?, ?)";
         $otp_stmt = $conn->prepare($insert_otp_sql);
         $otp_stmt->bind_param("ssss", $email, $otp_hash, $action_type, $expired_at);
-        
-        if (!$otp_stmt->execute()) {
-            echo json_encode(["status" => "error", "message" => "Database error generating OTP."]);
-            exit;
-        }
+        $otp_stmt->execute();
         $otp_stmt->close();
 
-        // 通过 PHPMailer 发送邮件
+        // 发送邮件
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -69,12 +64,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             $mail->addAddress($email);
 
             $mail->isHTML(true);
-            $mail->Subject = '[MoneyKu] Your Registration OTP Code';
-            $mail->Body    = "Hello! Your registration code is: <b style='font-size: 24px; color: #ff0000;'>{$otp}</b>. It expires in 5 minutes.";
-            $mail->AltBody = "Hello! Your registration code is: {$otp}. It expires in 5 minutes.";
+            $mail->Subject = '【MoneyKu】Reset Your Password OTP Code';
+            $mail->Body    = "Hello! You requested to reset your password. Your OTP code is: <b style='font-size: 24px; color: #dc3545;'>{$otp}</b>. It expires in 5 minutes. If you did not request this, please ignore this email.";
+            $mail->AltBody = "Hello! Your OTP code is: {$otp}. It expires in 5 minutes.";
 
             $mail->send();
-            echo json_encode(["status" => "success", "message" => "OTP sent to your email!"]);
+            echo json_encode(["status" => "success", "message" => "Reset OTP sent to your email!"]);
         } catch (Exception $e) {
             echo json_encode(["status" => "error", "message" => "Failed to send email. Mailer Error: " . $mail->ErrorInfo]);
         }
@@ -82,38 +77,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
 
-    // ==================== 动作 2：验证 OTP 并执行注册 ====================
-    if ($action === 'register') {
-        $username = trim($_POST['username'] ?? '');
+    // ==================== 2. 验证 OTP 并执行修改密码 ====================
+    if ($action === 'reset_password') {
         $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm_password = $_POST['confirm_password'] ?? '';
-        $role = $_POST['role'] ?? 'student';
+        $new_password = $_POST['new_password'] ?? '';
         $user_otp = trim($_POST['otp'] ?? '');
 
-        if (empty($username) || empty($email) || empty($password) || empty($confirm_password) || empty($user_otp)) {
-            echo json_encode(["status" => "error", "message" => "All fields including OTP are required!"]);
+        if (empty($email) || empty($new_password) || empty($user_otp)) {
+            echo json_encode(["status" => "error", "message" => "All fields are required!"]);
             exit;
         }
 
-        // 后端进行二次把关：确保密码一致
-        if ($password !== $confirm_password) {
-            echo json_encode(["status" => "error", "message" => "Passwords do not match!"]);
-            exit;
-        }
-
-        // 1. 获取当前 PHP 系统的本地时间
+        // 使用 PHP 时间比对方法
         $current_time = date("Y-m-d H:i:s");
 
-        // 2. 校验验证码
-        $otp_sql = "SELECT id, otp_code FROM user_otps WHERE identifier = ? AND action_type = 'register' AND is_used = 0 AND expired_at > ? ORDER BY id DESC LIMIT 1";
+        // 校验 action_type = 'reset' 的验证码
+        $otp_sql = "SELECT id, otp_code FROM user_otps WHERE identifier = ? AND action_type = 'reset' AND is_used = 0 AND expired_at > ? ORDER BY id DESC LIMIT 1";
         $otp_stmt = $conn->prepare($otp_sql);
         $otp_stmt->bind_param("ss", $email, $current_time);
         $otp_stmt->execute();
         $otp_result = $otp_stmt->get_result();
-       
+        
         if ($otp_result->num_rows === 0) {
-            echo json_encode(["status" => "error", "message" => "OTP expired or invalid! Please request a new one."]);
+            echo json_encode(["status" => "error", "message" => "OTP expired or invalid!"]);
             $otp_stmt->close();
             $conn->close();
             exit;
@@ -128,37 +114,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
         $otp_stmt->close();
 
-        // 验证码完全正确，先作废该验证码
+        // 验证码正确，作废它
         $update_otp_sql = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $update_otp_stmt = $conn->prepare($update_otp_sql);
         $update_otp_stmt->bind_param("i", $otp_row['id']);
         $update_otp_stmt->execute();
         $update_otp_stmt->close();
 
-        // 2. 检查用户名或邮箱冲突
-        $check_sql = "SELECT user_id FROM users WHERE username = ? OR email = ?";
-        $stmt = $conn->prepare($check_sql);
-        $stmt->bind_param("ss", $username, $email);
-        $stmt->execute();
-        $stmt->store_result();
+        // 执行 UPDATE 更新用户密码
+        $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
+        $update_user_sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+        $user_stmt = $conn->prepare($update_user_sql);
+        $user_stmt->bind_param("ss", $password_hash, $email);
 
-        if ($stmt->num_rows > 0) {
-            echo json_encode(["status" => "error", "message" => "Username or Email already registered!"]);
+        if ($user_stmt->execute()) {
+            echo json_encode(["status" => "success", "message" => "Password updated successfully! Redirecting to Login..."]);
         } else {
-            // 执行真正的插入用户操作
-            $password_hash = password_hash($password, PASSWORD_BCRYPT);
-            $insert_sql = "INSERT INTO users (username, email, password_hash, role, account_status) VALUES (?, ?, ?, ?, 'active')";
-            $insert_stmt = $conn->prepare($insert_sql);
-            $insert_stmt->bind_param("ssss", $username, $email, $password_hash, $role);
-
-            if ($insert_stmt->execute()) {
-                echo json_encode(["status" => "success", "message" => "Account created! Redirecting to Login..."]);
-            } else {
-                echo json_encode(["status" => "error", "message" => "Server error, please try again."]);
-            }
-            $insert_stmt->close();
+            echo json_encode(["status" => "error", "message" => "Failed to update password. Server error."]);
         }
-        $stmt->close();
+        $user_stmt->close();
         $conn->close();
         exit;
     }
@@ -169,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoneyKu - Register</title>
+    <title>MoneyKu - Forgot Password</title>
     <link rel="stylesheet" href="../css/loginRegister.css">
 </head>
 <body class="auth-page">
@@ -182,17 +156,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 <img src="../images/logo.png" alt="PFMS Logo" class="logo-img">
             </a>
         </div>
-        <h2>Get Started</h2>
-        <p class="subtitle">Create your MoneyKu account</p>
+        <h2>Reset Password</h2>
+        <p class="subtitle">Enter your email to reset your password</p>
 
-        <form id="registerForm">
-            <input type="hidden" id="formAction" name="action" value="register">
-
-            <div class="form-group">
-                <input type="text" id="username" name="username" placeholder=" " required maxlength="50">
-                <label for="username">Username</label>
-            </div>
-            
+        <form id="forgotForm">
             <div class="form-group">
                 <input type="email" id="email" name="email" placeholder=" " required maxlength="100">
                 <label for="email">Email Address</label>
@@ -207,44 +174,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             </div>
             
             <div class="form-group password-wrapper">
-                <input type="password" id="password" name="password" placeholder=" " required>
-                <label for="password">Password</label>
+                <input type="password" id="new_password" name="new_password" placeholder=" " required>
+                <label for="new_password">New Password</label>
                 <span class="toggle-password" id="togglePassword">👁️</span>
             </div>
-
-            <div class="form-group password-wrapper">
-                <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required>
-                <label for="confirm_password">Confirm Password</label>
-                <span class="toggle-password" id="toggleConfirmPassword">👁️</span>
-            </div>
             
-            <button type="submit" class="btn-submit" id="submitBtn">Create Account</button>
+            <button type="submit" class="btn-submit" id="submitBtn">Reset Password</button>
         </form>
 
         <p class="footer-text">
-            Already have an account? <a href="login.php">Sign In</a>
+            Remembered your password? <a href="login.php">Sign In</a>
         </p>
     </div>
 
     <script>
-        // 1. 独立封装的密码切换眼球逻辑
-        function setupPasswordToggle(toggleId, inputId) {
-            const toggleElement = document.getElementById(toggleId);
-            const inputElement = document.getElementById(inputId);
-            
-            toggleElement.addEventListener('click', function () {
-                const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
-                inputElement.setAttribute('type', type);
-                // ⚠️利用 👁️ (睁眼) 和 ❌ (你可以根据喜好改成其他，这里用 Unicode 变换表示切换状态)
-                this.textContent = type === 'password' ? '👁️' : '🔒'; 
-            });
-        }
-        
-        // 激活两组密码的切换眼睛
-        setupPasswordToggle('togglePassword', 'password');
-        setupPasswordToggle('toggleConfirmPassword', 'confirm_password');
+        // 密码隐藏/显示眼球控制
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('new_password');
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
 
-        // 2. 提示框
+        // 提示框
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -252,11 +205,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // ==================== 发送 OTP 的前端 JS 逻辑 ====================
+        // 发送重置密码的 OTP
         document.getElementById('sendOtpBtn').addEventListener('click', function () {
             const emailInput = document.getElementById('email');
             if (!emailInput.value || !emailInput.checkValidity()) {
-                showToast('Please enter a valid email address first.', 'error');
+                showToast('Please enter a valid email address.', 'error');
                 return;
             }
 
@@ -265,10 +218,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             sendBtn.textContent = 'Sending...';
 
             const otpData = new FormData();
-            otpData.append('action', 'send_otp');
+            otpData.append('action', 'send_reset_otp');
             otpData.append('email', emailInput.value);
 
-            fetch('register.php', {
+            fetch('forgot_password.php', {
                 method: 'POST',
                 body: otpData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -294,33 +247,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 }
             })
             .catch(() => {
-                showToast('Failed to send OTP. Network error.', 'error');
+                showToast('Network error.', 'error');
                 sendBtn.disabled = false;
                 sendBtn.textContent = 'Send OTP';
             });
         });
 
-        // 3. AJAX 注册逻辑
-        document.getElementById('registerForm').addEventListener('submit', function (e) {
+        // 提交修改新密码
+        document.getElementById('forgotForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            
-            // 【关键前端拦截】提交前检查两次密码输入
-            if (password !== confirmPassword) {
-                showToast('Passwords do not match! Please check again.', 'error');
-                return;
-            }
-
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = 'Creating...';
+            btn.textContent = 'Resetting...';
 
             const formData = new FormData(this);
-            formData.set('action', 'register');
+            formData.append('action', 'reset_password');
 
-            fetch('register.php', {
+            fetch('forgot_password.php', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -333,13 +276,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 } else {
                     showToast(data.message, 'error');
                     btn.disabled = false;
-                    btn.textContent = 'Create Account';
+                    btn.textContent = 'Reset Password';
                 }
             })
             .catch(() => {
                 showToast('Network connection failed.', 'error');
                 btn.disabled = false;
-                btn.textContent = 'Create Account';
+                btn.textContent = 'Reset Password';
             });
         });
     </script>

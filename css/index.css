@@ -1,12 +1,12 @@
 /* --- Premium Landing Page Theme (Light Mode) --- */
 :root {
     --primary: #10b981;
-    --primary-glow: rgba(16, 185, 129, 0.1); /* 浅色背景下降低炫光不透明度 */
-    --dark-bg: #F8FAFC;         /* 完美的浅蓝灰底色，告别纯白的单调 */
-    --card-bg: #ffffff;         /* 浅色模式下，卡片转为纯白 */
-    --card-border: #e2e8f0;     /* 使用细腻的浅灰边框取代半透明白 */
-    --text-main: #0f172a;       /* 主要文字改为深邃的蓝黑，确保清晰的可读性 */
-    --text-muted: #64748b;      /* 辅助文字 */
+    --primary-glow: rgba(16, 185, 129, 0.1);
+    --dark-bg: #F8FAFC;         
+    --card-bg: #ffffff;         
+    --card-border: #e2e8f0;     
+    --text-main: #0f172a;       
+    --text-muted: #64748b;      
 }
 
 body.landing-body {
@@ -39,7 +39,7 @@ body.landing-body::before {
     justify-content: space-between;
     align-items: center;
     padding: 24px 8%;
-    background: rgba(248, 250, 252, 0.8); /* 改为浅色半透明毛玻璃 */
+    background: #f8fafcd9;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--card-border);
@@ -48,14 +48,18 @@ body.landing-body::before {
     z-index: 100;
 }
 
+/* 优化Logo容器 */
 .logo {
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
 }
 
-.logo span {
-    color: var(--primary);
+/* 图片Logo特定控制类（高度限制防止撑开导航栏） */
+.logo-img {
+    height: 40px; 
+    width: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .nav-links {
@@ -77,8 +81,8 @@ body.landing-body::before {
 }
 
 .nav-links .btn-login {
-    color: var(--text-main); /* 文字转为深色 */
-    background: #ffffff;     /* 登录按钮改为白色底 */
+    color: var(--text-main);
+    background: #ffffff;     
     border: 1px solid var(--card-border);
     padding: 10px 22px;
     border-radius: 12px;
@@ -87,7 +91,7 @@ body.landing-body::before {
 }
 
 .nav-links .btn-login:hover {
-    color: #ffffff; /* 悬浮时变为白字 */
+    color: #ffffff;
     background: var(--primary);
     border-color: var(--primary);
     box-shadow: 0 10px 20px var(--primary-glow);
@@ -116,7 +120,7 @@ body.landing-body::before {
     align-items: center;
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.2);
-    color: #059669; /* 浅色背景下微调绿色的纯度，提高对比度 */
+    color: #059669;
     padding: 6px 16px;
     border-radius: 100px;
     font-size: 13px;
@@ -134,7 +138,7 @@ body.landing-body::before {
 }
 
 .hero-content h1 span {
-    background: linear-gradient(to right, #059669, #10b981); /* 稍微加深渐变色 */
+    background: linear-gradient(to right, #059669, #10b981);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -159,7 +163,7 @@ body.landing-body::before {
     border-radius: 12px;
     text-decoration: none;
     font-weight: 600;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25); /* 柔和浅色下的按钮投影 */
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
     transition: all 0.3s ease;
 }
 
@@ -170,7 +174,7 @@ body.landing-body::before {
 }
 
 .btn-secondary {
-    background: #ffffff; /* 切换为纯白按钮 */
+    background: #ffffff;
     color: var(--text-main);
     border: 1px solid var(--card-border);
     padding: 16px 32px;
@@ -198,9 +202,9 @@ body.landing-body::before {
 
 .hero-graphic svg {
     border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); /* 换用非常柔和的拟物化浅色阴影 */
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
     border: 1px solid var(--card-border);
-    background: #ffffff; /* 如果内部图表也是 SVG，将其背景设为白色 */
+    background: #ffffff;
 }
 
 /* --- Features Section Grid --- */
@@ -221,13 +225,12 @@ body.landing-body::before {
     border: 1px solid var(--card-border);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); /* 初始化微弱阴影 */
-    opacity: 0; /* 配合JS动画初始化状态 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    opacity: 0;
     transform: translateY(40px);
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 动效触发表（由 JavaScript 控制添加类名） */
 .feature-card.visible {
     opacity: 1;
     transform: translateY(0);
@@ -237,7 +240,7 @@ body.landing-body::before {
     background: #ffffff;
     border-color: rgba(16, 185, 129, 0.4);
     transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.03); /* 优化的浅色悬浮阴影 */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
 }
 
 .feature-icon {

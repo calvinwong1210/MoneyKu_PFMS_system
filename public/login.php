@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFMS - Premium Sign In</title>
+    <title>MoneyKu - Sign In</title>
     <link rel="stylesheet" href="../css/loginRegister.css">
 </head>
 <body class="auth-page">
@@ -61,12 +61,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     <div id="toast" class="toast"></div>
 
     <div class="auth-container">
+        <div class="logo">
+            <a href="index.php">
+                <img src="../images/logo.png" alt="PFMS Logo" class="logo-img">
+            </a>
+        </div>
         <h2>Welcome Back</h2>
-        <p class="subtitle">Enter your credentials to access PFMS</p>
+        <p class="subtitle">Enter your credentials to access MoneyKu</p>
 
         <form id="loginForm">
             <div class="form-group">
-                <input type="text" id="username_or_email" name="username_or_email" placeholder=" " required autocomplete="off">
+                <input type="text" id="username_or_email" name="username_or_email" placeholder=" " required>
                 <label Kakao for="username_or_email">Username or Email</label>
             </div>
             
@@ -76,11 +81,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 <span class="toggle-password" id="togglePassword">SHOW</span>
             </div>
             
+            <div class="forgot-password">
+                <a href="forgot_password.php">Forgot Password?</a>
+            </div>
+            
             <button type="submit" class="btn-submit" id="submitBtn">Sign In</button>
         </form>
 
         <p class="footer-text">
-            New to PFMS? <a href="register.php">Create an account</a>
+            New to MoneyKu? <a href="register.php">Create an account</a>
         </p>
     </div>
 

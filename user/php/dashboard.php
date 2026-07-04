@@ -38,5 +38,5 @@ $mock_data = [
 $savings_percentage = round(($mock_data['savings_current'] / $mock_data['savings_target']) * 100);
 
 // 3. 引入纯 HTML 视图层文件
-include '../html/dashboard_view.php';
+include '../view/dashboard_view.php';
 ?>

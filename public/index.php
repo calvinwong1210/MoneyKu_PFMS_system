@@ -12,13 +12,17 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFMS - Take Control of Your Financial Future</title>
+    <title>MoneyKu - Take Control of Your Financial Future</title>
     <link rel="stylesheet" href="../css/index.css">
 </head>
 <body class="landing-body">
 
     <header class="navbar">
-        <div class="logo">PFMS<span>.</span></div>
+        <div class="logo">
+            <a href="index.php">
+                <img src="../images/logo.png" alt="PFMS Logo" class="logo-img">
+            </a>
+        </div>
         <nav class="nav-links">
             <a href="#features">Features</a>
             <a href="login.php" class="btn-login">Sign In</a>
@@ -27,26 +31,37 @@ session_start();
 
     <main class="hero">
         <div class="hero-content">
-            <span class="badge">✦ Smart Financial Management</span>
-            <h1>Smart budgeting for your <span>next milestones.</span></h1>
-            <p>Track your daily expenses, monitor your subscriptions, set savings targets, and visualize your financial health with our all-in-one personal finance hub built for students and professionals.</p>
+            <h1>Smart personal finance management <span>for young adults</span></h1>
+            <p>Track your income and expenses, manage your student loan, plan your budget, and achieve your financial goals with one integrated personal finance system.</p>
             
             <div class="cta-group">
-                <a href="register.php" class="btn-primary">Get Started — It's Free</a>
+                <a href="register.php" class="btn-primary">Manage Your Finances Now</a>
                 <a href="#features" class="btn-secondary">Learn More</a>
             </div>
         </div>
 
         <div class="hero-graphic" id="tiltCard">
-            <svg width="420" height="360" viewBox="0 0 400 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="420" height="360" viewBox="0 0 400 350" xmlns="http://www.w3.org/2000/svg">
                 <rect width="400" height="350" rx="20" fill="#0f172a"/>
-                <rect x="30" y="40" width="340" height="60" rx="12" fill="#1e293b"/>
-                <circle cx="65" cy="70" r="15" fill="#10b981"/>
-                <rect x="100" y="60" width="120" height="8" rx="4" fill="#64748b"/>
-                <rect x="100" y="74" width="60" height="6" rx="3" fill="#334155"/>
-                <rect x="290" y="58" width="50" height="24" rx="12" fill="#10b981" fill-opacity="0.2"/>
-                <path d="M40 280 L120 220 L200 250 L280 160 L360 190" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="280" cy="160" r="6" fill="#ffffff"/>
+                <rect x="25" y="25" width="350" height="80" rx="16" fill="#1e293b"/>
+                <text x="45" y="52" fill="#94a3b8" font-size="13" font-family="Arial">Total Balance</text>
+                <text x="45" y="82" fill="#ffffff" font-size="28" font-weight="bold" font-family="Arial">RM 12,450</text>
+                <rect x="30" y="125" width="100" height="70" rx="12" fill="#1e293b"/>
+                <text x="45" y="150" fill="#94a3b8" font-size="11">Income</text>
+                <text x="45" y="175" fill="#10b981" font-size="18">+3000</text>
+                <rect x="150" y="125" width="100" height="70" rx="12" fill="#1e293b"/>
+                <text x="165" y="150" fill="#94a3b8" font-size="11">Expense</text>
+                <text x="165" y="175" fill="#ef4444" font-size="18">-1000</text>
+                <rect x="270" y="125" width="100" height="70" rx="12" fill="#1e293b"/>
+                <text x="285" y="150" fill="#94a3b8" font-size="11">Savings</text>
+                <text x="285" y="175" fill="#10b981" font-size="18">2000</text>
+
+                <path d="M40 285 L100 245 L170 260 L240 190 L320 210 L360 170" stroke="#10b981" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="320" cy="210" r="6" fill="#ffffff"/>
+
+                <text x="40" y="320" fill="#94a3b8" font-size="12">Savings Goal</text>
+                <rect x="145" y="309" width="180" height="12" rx="6" fill="#334155"/>
+                <rect x="145" y="309" width="140" height="12" rx="6" fill="#10b981"/>
             </svg>
         </div>
     </main>
@@ -54,23 +69,23 @@ session_start();
     <section id="features" class="features-grid">
         <div class="feature-card">
             <div class="feature-icon">📊</div>
-            <h3>Expense Analytics</h3>
-            <p>Categorize your spending habits automatically. Visualize where your money goes with clear, interactive micro-charts.</p>
+            <h3>Budget Management</h3>
+            <p>Track your income and expenses with clear spending insights.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🎯</div>
             <h3>Savings Goals</h3>
-            <p>Planning for tuition, gadgets, or travel? Set milestones and watch your progress update in real time.</p>
+            <p>Set savings targets and monitor your progress toward future goals.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🔒</div>
-            <h3>Secure &amp; Reliable</h3>
-            <p>Your security is our priority. Your password and personal account profiles are protected using industry-grade encryption.</p>
+            <h3>Financial Dashboard</h3>
+            <p>View your financial overview, spending trends, and savings performance in one place.</p>
         </div>
     </section>
 
     <script>
-        // 1. Mouse Tilt Effect for Hero Graphic (高级3D卡片倾斜交互)
+        // 1. Mouse Tilt Effect for Hero Graphic
         const card = document.getElementById('tiltCard');
         if(card) {
             document.addEventListener('mousemove', (e) => {
@@ -78,13 +93,13 @@ session_start();
                 const cy = window.innerHeight / 2;
                 const dx = e.clientX - cx;
                 const dy = e.clientY - cy;
-                const tiltX = (dy / cy) * 15; // 倾斜角度系数
+                const tiltX = (dy / cy) * 15;
                 const tiltY = -(dx / cx) * 15;
                 card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
             });
         }
 
-        // 2. Intersection Observer (滚动到特定视口时卡片平滑淡入)
+        // 2. Intersection Observer
         const cards = document.querySelectorAll('.feature-card');
         const observerOptions = {
             threshold: 0.1,
@@ -94,7 +109,6 @@ session_start();
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {
                 if (entry.isIntersecting) {
-                    // 增加级联延迟（Staggered Delay），让卡片一个接一个浮现
                     setTimeout(() => {
                         entry.target.classList.add('visible');
                     }, index * 150); 
