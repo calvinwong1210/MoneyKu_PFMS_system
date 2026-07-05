@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
-        $role = $_POST['role'] ?? 'student';
+        $role = $_POST['role'] ?? 'user';
         $user_otp = trim($_POST['otp'] ?? '');
 
         if (empty($username) || empty($email) || empty($password) || empty($confirm_password) || empty($user_otp)) {

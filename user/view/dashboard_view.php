@@ -9,28 +9,7 @@
 </head>
 <body class="dashboard-body">
 
-    <aside class="sidebar">
-        <div class="brand">PFMS<span>.</span></div>
-        <nav class="menu">
-            <a href="dashboard.php" class="menu-item active">
-                <span class="icon">📊</span> Dashboard
-            </a>
-            <a href="#transactions" class="menu-item">
-                <span class="icon">💸</span> Transactions
-            </a>
-            <a href="#budgets" class="menu-item">
-                <span class="icon">🎯</span> Budgets
-            </a>
-            <a href="#analytics" class="menu-item">
-                <span class="icon">📈</span> Analytics
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="../../public/logout.php" class="btn-logout">
-                <span class="icon">🚪</span> Sign Out
-            </a>
-        </div>
-    </aside>
+<?php require_once '../sidebar.php'; ?>
 
     <main class="main-content">
         
@@ -39,6 +18,7 @@
                 <h1>Welcome back, <?php echo htmlspecialchars($username); ?></h1>
                 <p>Here's your financial overview for today.</p>
             </div>
+        <a href="user_profile.php" class="user-profile-link" style="text-decoration: none; color: inherit;">
             <div class="user-profile">
                 <div class="avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
                 <div class="info">
@@ -46,6 +26,7 @@
                     <span class="role"><?php echo ucfirst($role); ?></span>
                 </div>
             </div>
+        </a>
         </header>
 
         <section class="cards-grid">

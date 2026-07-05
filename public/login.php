@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
 
         document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault(); /
+            e.preventDefault(); 
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;

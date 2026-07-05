@@ -289,6 +289,20 @@ body.dashboard-body {
 .tx-amount.positive { color: #10b981; }
 .tx-amount.negative { color: var(--text-main); } /* 支出不使用刺眼的纯红，保持黑色的高级克制感 */
 
+.logo {
+    display: flex;
+    align-items: center;
+    padding-bottom: 24px;
+}
+
+.logo-img {
+    height: 40px; 
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+
 /* 自适应适配 */
 @media (max-width: 1024px) {
     .cards-grid { grid-template-columns: 1fr; }
