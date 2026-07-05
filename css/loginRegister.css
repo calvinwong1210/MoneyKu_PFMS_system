@@ -1,13 +1,12 @@
-/* --- Premium Theme Setup (Light Mode) --- */
 :root {
     --primary: #10b981;
-    --primary-glow: rgba(16, 185, 129, 0.15); /* 浅色下调低发光浓度 */
-    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); /* 换成优雅的浅蓝灰渐变 */
-    --glass-bg: #ffffff;         /* 浅色模式下，容器采用纯白 */
-    --glass-border: #e2e8f0;     /* 细腻的灰色边框 */
-    --text-main: #0f172a;       /* 主要文字转为深邃的蓝黑 */
-    --text-muted: #64748b;      /* 辅助文字 */
-    --primary-dark: #059669;    /* 补全原代码遗漏的按钮悬浮加深变量 */
+    --primary-glow: rgba(16, 185, 129, 0.15); 
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+    --glass-bg: #ffffff;        
+    --glass-border: #e2e8f0; 
+    --text-main: #0f172a;     
+    --text-muted: #64748b; 
+    --primary-dark: #059669; 
 }
 
 .logo {
@@ -17,7 +16,6 @@
     margin-bottom: 24px;
 }
 
-/* 图片Logo特定控制类（高度限制防止撑开导航栏） */
 .logo-img {
     height: 40px; 
     width: auto;
@@ -43,7 +41,6 @@ body.auth-page {
     position: relative;
 }
 
-/* 背景炫光装饰，保持清爽 */
 body.auth-page::before {
     content: '';
     position: absolute;
@@ -51,13 +48,12 @@ body.auth-page::before {
     height: 400px;
     background: var(--primary);
     filter: blur(150px);
-    opacity: 0.08; /* 降低透明度，防止在浅色背景下过饱 */
+    opacity: 0.08; 
     top: 15%;
     left: 20%;
     border-radius: 50%;
 }
 
-/* --- Card Container --- */
 .auth-container {
     background: var(--glass-bg);
     backdrop-filter: blur(16px);
@@ -67,7 +63,7 @@ body.auth-page::before {
     border-radius: 24px;
     width: 100%;
     max-width: 420px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05); /* 换用非常柔和的轻量阴影 */
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05); 
     transform: translateY(0);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -93,7 +89,6 @@ h2 {
     margin-bottom: 32px;
 }
 
-/* --- Advanced Floating Label Form Groups --- */
 .form-group {
     position: relative;
     margin-bottom: 24px;
@@ -102,7 +97,7 @@ h2 {
 .form-group input, .form-group select {
     width: 100%;
     padding: 14px 16px;
-    background: #f8fafc; /* 输入框略微带一点浅灰，增加视觉层次 */
+    background: #f8fafc; 
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     color: var(--text-main);
@@ -111,7 +106,6 @@ h2 {
     transition: all 0.3s ease;
 }
 
-/* 下拉菜单处理 */
 .form-group select {
     cursor: pointer;
     appearance: none;
@@ -124,7 +118,6 @@ h2 {
     box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* 浮动标签动画核心 */
 .form-group label {
     position: absolute;
     left: 16px;
@@ -136,30 +129,23 @@ h2 {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 当输入框聚焦，或者里面有字的时候，标签往上飘 */
+ /* when start typing, placeholder will go up */
 .form-group input:focus ~ label,
 .form-group input:not(:placeholder-shown) ~ label {
     top: 0;
     font-size: 12px;
-    color: #059669; /* 稍微加深飘起后的绿色，提升浅色下的可读性 */
-    background: #ffffff; /* 【核心修复】改为卡片的纯白背景，完美遮挡边框 */
+    color: #059669; 
+    background: #ffffff; 
     padding: 0 6px;
     transform: translateY(-50%) scale(0.9);
 }
-
-/* 针对Select选择框的特殊标签处理 */
 .form-group.has-select label {
     top: 0;
     font-size: 12px;
     color: #059669;
-    background: #ffffff; /* 【核心修复】改为纯白背景 */
+    background: #ffffff; 
     padding: 0 6px;
     transform: translateY(-50%) scale(0.9);
-}
-
-/* --- Password Toggle Eye Icon --- */
-.password-wrapper {
-    position: relative;
 }
 
 .toggle-password {
@@ -188,7 +174,7 @@ h2 {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); /* 增加按钮在浅色下的呼吸感阴影 */
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); 
     transition: all 0.3s ease;
     display: flex;
     justify-content: center;
@@ -203,14 +189,13 @@ h2 {
 }
 
 .btn-submit:disabled {
-    background: #cbd5e1; /* 禁用状态换用清爽的浅灰 */
+    background: #cbd5e1; 
     color: #94a3b8;
     opacity: 1;
     cursor: not-allowed;
     box-shadow: none;
 }
 
-/* --- Toast Notification (AJAX 提示框) --- */
 .toast {
     position: fixed;
     top: 24px;
@@ -220,7 +205,7 @@ h2 {
     color: white;
     font-weight: 500;
     font-size: 14px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15); /* 提示框阴影淡化 */
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15); 
     transform: translateX(150%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1000;
@@ -268,30 +253,35 @@ h2 {
     text-decoration: underline;
 }
 
-/* --- Password Toggle Eye Icon --- */
 .password-wrapper {
     position: relative;
 }
 
+/* show and hide password icon */
 .toggle-password {
     position: absolute;
     right: 16px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: var(--text-muted);
     user-select: none;
-    font-size: 18px; /* 稍微放大一点让图标更好看 */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    transition: color 0.2s ease;
+    width: 35px;  /* 限制点击区域大小 */
+    height: 35px;
+    transition: opacity 0.2s ease;
+}
+
+.toggle-password img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
 }
 
 .toggle-password:hover {
-    color: var(--text-main);
+    opacity: 0.8; 
 }
 
 .otp-group {

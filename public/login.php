@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 处理 AJAX 异步登录 POST 请求
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
     require_once '../config/db_config.php';
@@ -42,7 +41,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     exit;
 }
 
-// 如果用户已经是登录状态，直接跳走
 // if (isset($_SESSION['user_id'])) {
 //     header("Location: ../user/php/dashboard.php");
 //     exit();
@@ -78,7 +76,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             <div class="form-group password-wrapper">
                 <input type="password" id="password" name="password" placeholder=" " required>
                 <label for="password">Password</label>
-                <span class="toggle-password" id="togglePassword">SHOW</span>
+                <span class="toggle-password" id="togglePassword">
+                    <img src="../images/hide_password.png" alt="Toggle Password">
+                </span>            
             </div>
             
             <div class="forgot-password">
@@ -94,17 +94,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     </div>
 
     <script>
-        // 1. 密码隐藏与显示切换
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+        function showHidePassword(toggleId, inputId) {
+            const toggleElement = document.getElementById(toggleId);
+            const inputElement = document.getElementById(inputId);
+            const imgElement = toggleElement.querySelector('img');
+            
+            toggleElement.addEventListener('click', function () {
+                const isPassword = inputElement.getAttribute('type') === 'password';
+                inputElement.setAttribute('type', isPassword ? 'text' : 'password');
+                imgElement.src = isPassword ? '../images/show_password.png' : '../images/hide_password.png';
+            });
+        }
+        showHidePassword('togglePassword', 'password');
 
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? 'SHOW' : 'HIDE';
-        });
-
-        // 2. 高级 Toast 弹窗通知
+        // toast function
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -112,9 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // 3. AJAX 异步无刷新提交
         document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // 阻止表单原生刷新动作
+            e.preventDefault(); /
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
@@ -122,11 +124,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
 
             const formData = new FormData(this);
 
-            // 发送异步异步Fetch请求
             fetch('login.php', {
                 method: 'POST',
                 body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' } // 告诉后端这是个 AJAX 请求
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } 
             })
             .then(res => res.json())
             .then(data => {

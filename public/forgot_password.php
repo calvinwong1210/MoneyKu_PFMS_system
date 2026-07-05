@@ -81,10 +81,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     if ($action === 'reset_password') {
         $email = trim($_POST['email'] ?? '');
         $new_password = $_POST['new_password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
         $user_otp = trim($_POST['otp'] ?? '');
 
-        if (empty($email) || empty($new_password) || empty($user_otp)) {
+        if (empty($email) || empty($new_password) || empty($confirm_password) || empty($user_otp)) {
             echo json_encode(["status" => "error", "message" => "All fields are required!"]);
+            exit;
+        }
+
+        // 后端做二次把关：确保两次密码一致
+        if ($new_password !== $confirm_password) {
+            echo json_encode(["status" => "error", "message" => "Passwords do not match!"]);
             exit;
         }
 
@@ -160,10 +167,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         <p class="subtitle">Enter your email to reset your password</p>
 
         <form id="forgotForm">
-            <div class="form-group">
-                <input type="email" id="email" name="email" placeholder=" " required maxlength="100">
+            <div class="form-group" style="position: relative;">
+                <input type="email" id="email" name="email" placeholder=" " required maxlength="100" style="padding-right: 110px;">
                 <label for="email">Email Address</label>
-                <div class="otp-group" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 5;">
+                <div class="otp-group" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 10;">
                     <button type="button" class="btn-otp" id="sendOtpBtn" style="height: 38px; padding: 0 12px; border-radius: 8px;">Send OTP</button>
                 </div>
             </div>
@@ -176,7 +183,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             <div class="form-group password-wrapper">
                 <input type="password" id="new_password" name="new_password" placeholder=" " required>
                 <label for="new_password">New Password</label>
-                <span class="toggle-password" id="togglePassword">👁️</span>
+                <span class="toggle-password" id="toggleNewPassword" style="z-index: 10;">
+                    <img src="../images/hide_password.png" alt="Toggle Password">
+                </span>
+            </div>
+            
+            <div class="form-group password-wrapper">
+                <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required>
+                <label for="confirm_password">Confirm Password</label>
+                <span class="toggle-password" id="toggleConfirmPassword" style="z-index: 10;">
+                    <img src="../images/hide_password.png" alt="Toggle Password">
+                </span>
             </div>
             
             <button type="submit" class="btn-submit" id="submitBtn">Reset Password</button>
@@ -188,16 +205,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     </div>
 
     <script>
-        // 密码隐藏/显示眼球控制
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('new_password');
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
+        function showHidePassword(toggleId, inputId) {
+            const toggleElement = document.getElementById(toggleId);
+            const inputElement = document.getElementById(inputId);
+            if (!toggleElement || !inputElement) return;
+            
+            const imgElement = toggleElement.querySelector('img');
+            
+            toggleElement.addEventListener('click', function () {
+                const isPassword = inputElement.getAttribute('type') === 'password';
+                inputElement.setAttribute('type', isPassword ? 'text' : 'password');
+                imgElement.src = isPassword ? '../images/show_password.png' : '../images/hide_password.png';
+            });
+        }
 
-        // 提示框
+        // fix: send the correct ID that matched the HTML
+        showHidePassword('toggleNewPassword', 'new_password');
+        showHidePassword('toggleConfirmPassword', 'confirm_password');
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -205,7 +230,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // 发送重置密码的 OTP
         document.getElementById('sendOtpBtn').addEventListener('click', function () {
             const emailInput = document.getElementById('email');
             if (!emailInput.value || !emailInput.checkValidity()) {
@@ -253,9 +277,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             });
         });
 
-        // 提交修改新密码
         document.getElementById('forgotForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            
+            const password = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match! Please check again.', 'error');
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = 'Resetting...';

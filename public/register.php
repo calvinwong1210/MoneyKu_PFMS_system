@@ -1,5 +1,4 @@
 <?php
-// 引入 PHPMailer 核心文件 (请根据你的项目实际路径调整)
 require_once '../PHPMailer/src/Exception.php';
 require_once '../PHPMailer/src/PHPMailer.php';
 require_once '../PHPMailer/src/SMTP.php';
@@ -7,14 +6,13 @@ require_once '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// 处理 AJAX 异步请求
+// handle AJAX requests for sending OTP and register user
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
     require_once '../config/db_config.php';
+    $action = $_POST['action'] ?? ''; 
 
-    $action = $_POST['action'] ?? ''; // 判断是发验证码还是注册
-
-    // ==================== 动作 1：发送 OTP ====================
+    // send OTP
     if ($action === 'send_otp') {
         $email = trim($_POST['email'] ?? '');
 
@@ -23,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // 检查 Email 是否已被注册
         $check_sql = "SELECT user_id FROM users WHERE email = ?";
         $stmt = $conn->prepare($check_sql);
         $stmt->bind_param("s", $email);
@@ -37,12 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
         $stmt->close();
 
-        // 生成 6 位随机 OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
         $expired_at = date("Y-m-d H:i:s", strtotime("+5 minutes"));
 
-        // 存入数据库
         $action_type = 'register';
         $insert_otp_sql = "INSERT INTO user_otps (identifier, otp_code, action_type, expired_at) VALUES (?, ?, ?, ?)";
         $otp_stmt = $conn->prepare($insert_otp_sql);
@@ -54,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
         $otp_stmt->close();
 
-        // 通过 PHPMailer 发送邮件
+        // use PHPMailer send email
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -82,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
 
-    // ==================== 动作 2：验证 OTP 并执行注册 ====================
+    // verify OTP and register user
     if ($action === 'register') {
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -96,16 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // 后端进行二次把关：确保密码一致
         if ($password !== $confirm_password) {
             echo json_encode(["status" => "error", "message" => "Passwords do not match!"]);
             exit;
         }
 
-        // 1. 获取当前 PHP 系统的本地时间
         $current_time = date("Y-m-d H:i:s");
-
-        // 2. 校验验证码
         $otp_sql = "SELECT id, otp_code FROM user_otps WHERE identifier = ? AND action_type = 'register' AND is_used = 0 AND expired_at > ? ORDER BY id DESC LIMIT 1";
         $otp_stmt = $conn->prepare($otp_sql);
         $otp_stmt->bind_param("ss", $email, $current_time);
@@ -128,14 +119,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
         $otp_stmt->close();
 
-        // 验证码完全正确，先作废该验证码
+        // verify successful, and disable the OTP
         $update_otp_sql = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $update_otp_stmt = $conn->prepare($update_otp_sql);
         $update_otp_stmt->bind_param("i", $otp_row['id']);
         $update_otp_stmt->execute();
         $update_otp_stmt->close();
 
-        // 2. 检查用户名或邮箱冲突
         $check_sql = "SELECT user_id FROM users WHERE username = ? OR email = ?";
         $stmt = $conn->prepare($check_sql);
         $stmt->bind_param("ss", $username, $email);
@@ -145,7 +135,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         if ($stmt->num_rows > 0) {
             echo json_encode(["status" => "error", "message" => "Username or Email already registered!"]);
         } else {
-            // 执行真正的插入用户操作
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
             $insert_sql = "INSERT INTO users (username, email, password_hash, role, account_status) VALUES (?, ?, ?, ?, 'active')";
             $insert_stmt = $conn->prepare($insert_sql);
@@ -209,13 +198,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             <div class="form-group password-wrapper">
                 <input type="password" id="password" name="password" placeholder=" " required>
                 <label for="password">Password</label>
-                <span class="toggle-password" id="togglePassword">👁️</span>
+                <span class="toggle-password" id="togglePassword">
+                    <img src="../images/hide_password.png" alt="Toggle Password">
+                </span>
             </div>
 
             <div class="form-group password-wrapper">
                 <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required>
                 <label for="confirm_password">Confirm Password</label>
-                <span class="toggle-password" id="toggleConfirmPassword">👁️</span>
+                <span class="toggle-password" id="toggleConfirmPassword">
+                    <img src="../images/hide_password.png" alt="Toggle Password">
+                </span>
             </div>
             
             <button type="submit" class="btn-submit" id="submitBtn">Create Account</button>
@@ -227,24 +220,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     </div>
 
     <script>
-        // 1. 独立封装的密码切换眼球逻辑
-        function setupPasswordToggle(toggleId, inputId) {
+        function showHidePassword(toggleId, inputId) {
             const toggleElement = document.getElementById(toggleId);
             const inputElement = document.getElementById(inputId);
+            const imgElement = toggleElement.querySelector('img');
             
             toggleElement.addEventListener('click', function () {
-                const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
-                inputElement.setAttribute('type', type);
-                // ⚠️利用 👁️ (睁眼) 和 ❌ (你可以根据喜好改成其他，这里用 Unicode 变换表示切换状态)
-                this.textContent = type === 'password' ? '👁️' : '🔒'; 
+                const isPassword = inputElement.getAttribute('type') === 'password';
+                
+                inputElement.setAttribute('type', isPassword ? 'text' : 'password');
+                imgElement.src = isPassword ? '../images/show_password.png' : '../images/hide_password.png';
             });
         }
-        
-        // 激活两组密码的切换眼睛
-        setupPasswordToggle('togglePassword', 'password');
-        setupPasswordToggle('toggleConfirmPassword', 'confirm_password');
 
-        // 2. 提示框
+        showHidePassword('togglePassword', 'password');
+        showHidePassword('toggleConfirmPassword', 'confirm_password');
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -252,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // ==================== 发送 OTP 的前端 JS 逻辑 ====================
+        // send OTP button click event
         document.getElementById('sendOtpBtn').addEventListener('click', function () {
             const emailInput = document.getElementById('email');
             if (!emailInput.value || !emailInput.checkValidity()) {
@@ -300,14 +291,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             });
         });
 
-        // 3. AJAX 注册逻辑
         document.getElementById('registerForm').addEventListener('submit', function (e) {
             e.preventDefault();
             
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             
-            // 【关键前端拦截】提交前检查两次密码输入
             if (password !== confirmPassword) {
                 showToast('Passwords do not match! Please check again.', 'error');
                 return;

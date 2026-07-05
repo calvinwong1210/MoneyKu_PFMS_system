@@ -1,4 +1,3 @@
-/* --- Premium Landing Page Theme (Light Mode) --- */
 :root {
     --primary: #10b981;
     --primary-glow: rgba(16, 185, 129, 0.1);
@@ -20,7 +19,6 @@ body.landing-body {
     position: relative;
 }
 
-/* 炫光背景氛围感 */
 body.landing-body::before {
     content: '';
     position: absolute;
@@ -33,7 +31,6 @@ body.landing-body::before {
     pointer-events: none;
 }
 
-/* --- Navbar --- */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -48,13 +45,11 @@ body.landing-body::before {
     z-index: 100;
 }
 
-/* 优化Logo容器 */
 .logo {
     display: flex;
     align-items: center;
 }
 
-/* 图片Logo特定控制类（高度限制防止撑开导航栏） */
 .logo-img {
     height: 40px; 
     width: auto;
@@ -98,7 +93,6 @@ body.landing-body::before {
     transform: translateY(-2px);
 }
 
-/* --- Hero Section --- */
 .hero {
     display: flex;
     align-items: center;
@@ -113,20 +107,6 @@ body.landing-body::before {
 
 .hero-content {
     max-width: 600px;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    color: #059669;
-    padding: 6px 16px;
-    border-radius: 100px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 28px;
 }
 
 .hero-content h1 {
@@ -190,24 +170,6 @@ body.landing-body::before {
     border-color: #cbd5e1;
 }
 
-/* --- Hero Graphic Tilt Effect --- */
-.hero-graphic {
-    flex: 0 1 500px;
-    display: flex;
-    justify-content: center;
-    position: relative;
-    transition: transform 0.2s ease;
-    perspective: 1000px;
-}
-
-.hero-graphic svg {
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-    border: 1px solid var(--card-border);
-    background: #ffffff;
-}
-
-/* --- Features Section Grid --- */
 .features-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -269,7 +231,7 @@ body.landing-body::before {
     line-height: 1.6;
 }
 
-/* 响应式断点 */
+/* reponsive */
 @media (max-width: 992px) {
     .hero {
         flex-direction: column;
