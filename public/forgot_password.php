@@ -1,5 +1,4 @@
 <?php
-// 引入 PHPMailer
 require_once '../PHPMailer/src/Exception.php';
 require_once '../PHPMailer/src/PHPMailer.php';
 require_once '../PHPMailer/src/SMTP.php';
@@ -13,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
 
     $action = $_POST['action'] ?? '';
 
-    // ==================== 1. 发送重置密码的 OTP ====================
+    // send reset password OTP
     if ($action === 'send_reset_otp') {
         $email = trim($_POST['email'] ?? '');
 
@@ -22,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // 检查 Email 是否存在于系统
         $check_sql = "SELECT user_id FROM users WHERE email = ?";
         $stmt = $conn->prepare($check_sql);
         $stmt->bind_param("s", $email);
@@ -36,12 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         }
         $stmt->close();
 
-        // 生成 6 位 OTP
+        // random 6 OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
         $expired_at = date("Y-m-d H:i:s", strtotime("+5 minutes"));
 
-        // 存入数据库，action_type 标记为 'reset'
+        // save to database with action_type = "reset"
         $action_type = 'reset';
         $insert_otp_sql = "INSERT INTO user_otps (identifier, otp_code, action_type, expired_at) VALUES (?, ?, ?, ?)";
         $otp_stmt = $conn->prepare($insert_otp_sql);
@@ -49,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         $otp_stmt->execute();
         $otp_stmt->close();
 
-        // 发送邮件
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -77,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
 
-    // ==================== 2. 验证 OTP 并执行修改密码 ====================
+    // verify OTP and reset password
     if ($action === 'reset_password') {
         $email = trim($_POST['email'] ?? '');
         $new_password = $_POST['new_password'] ?? '';
@@ -89,16 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // 后端做二次把关：确保两次密码一致
         if ($new_password !== $confirm_password) {
             echo json_encode(["status" => "error", "message" => "Passwords do not match!"]);
             exit;
         }
 
-        // 使用 PHP 时间比对方法
         $current_time = date("Y-m-d H:i:s");
 
-        // 校验 action_type = 'reset' 的验证码
         $otp_sql = "SELECT id, otp_code FROM user_otps WHERE identifier = ? AND action_type = 'reset' AND is_used = 0 AND expired_at > ? ORDER BY id DESC LIMIT 1";
         $otp_stmt = $conn->prepare($otp_sql);
         $otp_stmt->bind_param("ss", $email, $current_time);
@@ -122,13 +116,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         $otp_stmt->close();
 
         // 验证码正确，作废它
+        // update OTP as used
         $update_otp_sql = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $update_otp_stmt = $conn->prepare($update_otp_sql);
         $update_otp_stmt->bind_param("i", $otp_row['id']);
         $update_otp_stmt->execute();
         $update_otp_stmt->close();
-
-        // 执行 UPDATE 更新用户密码
+        
         $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
         $update_user_sql = "UPDATE users SET password_hash = ? WHERE email = ?";
         $user_stmt = $conn->prepare($update_user_sql);
