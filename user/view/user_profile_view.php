@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PFMS - User Profile</title>
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/user_sidebar.css">
     <link rel="stylesheet" href="../css/user_profile.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -19,13 +19,6 @@
             <div class="welcome-text">
                 <h1>Account Settings</h1>
                 <p>Manage your personal profile and identity credentials.</p>
-            </div>
-            <div class="user-profile">
-                <div class="avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
-                <div class="info">
-                    <span class="name"><?php echo htmlspecialchars($username); ?></span>
-                    <span class="role"><?php echo ucfirst($role); ?></span>
-                </div>
             </div>
         </header>
 

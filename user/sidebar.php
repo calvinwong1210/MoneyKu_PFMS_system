@@ -1,7 +1,13 @@
 <?php
-// 获取当前运行的脚本文件名（例如：dashboard.php 或 user_profile.php）
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $current_page = basename($_SERVER['PHP_SELF']);
+$username = $_SESSION['username'] ?? 'User';
+$role = $_SESSION['role'] ?? 'Member';
 ?>
+    <link rel="stylesheet" href="../css/user_sidebar.css">
+
 <aside class="sidebar">
     <div class="logo">
         <a href="dashboard.php">
@@ -12,7 +18,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="dashboard.php" class="menu-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
             <span class="icon">📊</span> Dashboard
         </a>
-        <a href="#transactions" class="menu-item">
+        <a href="user_transaction.php" class="menu-item <?php echo ($current_page == 'user_transaction.php') ? 'active' : ''; ?>">
             <span class="icon">💸</span> Transactions
         </a>
         <a href="#budgets" class="menu-item">
@@ -22,6 +28,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span class="icon">📈</span> Analytics
         </a>
     </nav>
+    <div class="sidebar-profile">
+        <a href="user_profile.php" class="sidebar-profile-link" style="text-decoration: none; color: inherit; display: block; width: 100%;">
+            <div class="user-profile">
+                <div class="avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
+                <div class="info">
+                    <span class="name"><?php echo htmlspecialchars($username); ?></span>
+                    <span class="role"><?php echo ucfirst($role); ?></span>
+                </div>
+            </div>
+        </a>
+    </div>
     <div class="sidebar-footer">
         <a href="../../public/logout.php" class="btn-logout">
             <span class="icon">🚪</span> Sign Out

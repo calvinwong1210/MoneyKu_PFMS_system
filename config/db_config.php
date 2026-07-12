@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set('Asia/Kuala_Lumpur');
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
-    die('禁止直接访问此脚本。');
+    die('Not allowed to access this file directly');
 }
 
 $host    = 'localhost';

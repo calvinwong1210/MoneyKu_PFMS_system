@@ -1,44 +1,37 @@
 /* --- Premium Profile Card Setup --- */
 .profile-container {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--card-bg);
+    border: 1px solid var(--borders);
     padding: 32px;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.02);
+    box-shadow: var(--shadow-md);
     margin-top: 32px;
     max-width: 800px;
 }
 
 .profile-card-header {
     margin-bottom: 28px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--borders);
     padding-bottom: 16px;
 }
 
 .profile-card-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-main);
     text-align: left;
     margin-bottom: 4px;
 }
 
 .profile-card-header p {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 14px;
 }
 
-/* 优雅的网格布局，一行两列分布 */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-}
-
-@media (max-width: 640px) {
-    .form-grid {
-        grid-template-columns: 1fr; /* 手机端自动切回单列 */
-    }
 }
 
 .form-group-p {
@@ -50,51 +43,50 @@
 .form-group-p label {
     font-size: 14px;
     font-weight: 500;
-    color: #475569;
+    color: var(--text-muted);
 }
 
 .form-group-p input, .form-group-p select {
     width: 100%;
     padding: 12px 16px;
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--borders);
     border-radius: 10px;
-    color: #0f172a;
+    color: var(--text-main);
     font-size: 14px;
     outline: none;
     transition: all 0.2s ease;
 }
 
 .form-group-p input:focus, .form-group-p select:focus {
-    border-color: #10b981;
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    border-color: var(--primary);
+    background: var(--card-bg);
+    box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* 表单提交区域 */
 .form-actions {
     margin-top: 32px;
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--borders);
     padding-top: 20px;
 }
 
 .btn-save {
     padding: 12px 24px;
-    background: #10b981;
+    background: var(--primary);
     border: none;
     border-radius: 10px;
     color: #ffffff;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 4px 12px var(--primary-glow);
     transition: all 0.2s ease;
 }
 
 .btn-save:hover {
-    background: #059669;
+    background: var(--primary-dark);
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
 }
@@ -105,4 +97,10 @@
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
+}
+
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr; 
+    }
 }

@@ -1,0 +1,175 @@
+/* --- Transaction Manager Specific Styles --- */
+
+.workspace-header {
+    margin-bottom: 32px;
+}
+
+.workspace-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.workspace-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+/* --- Split Panel Workspace Grid --- */
+.workspace-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+/* --- Premium Air-Shadow Containers --- */
+.form-card, .table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--borders);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-air);
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: -0.3px;
+}
+
+/* --- Premium White-Backed Floating Label Sub-System --- */
+.form-group {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    border: 1px solid var(--borders);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.form-group label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Floating Animation Actions: Locks Background Color to Card White */
+.form-group input:focus ~ label,
+.form-group input:not(:placeholder-shown) ~ label {
+    top: 0;
+    font-size: 12px;
+    color: var(--primary-dark);
+    background: var(--card-bg);
+    padding: 0 6px;
+    transform: translateY(-50%);
+    font-weight: 500;
+}
+
+/* Special Floating Overrides for Un-Clickable Date & Type drop-downs */
+.form-group.has-select label {
+    top: 0;
+    font-size: 12px;
+    background: var(--card-bg);
+    padding: 0 6px;
+    transform: translateY(-50%);
+}
+
+/* --- Clean Modern SaaS Operations Bar --- */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    border: none;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+    background: var(--text-muted);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Premium Light Mode Table Presentation --- */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-table th {
+    text-align: left;
+    padding: 14px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--borders);
+    background: #f8fafc;
+}
+
+.transaction-table td {
+    padding: 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.tx-date { color: var(--text-muted); }
+.tx-desc { color: var(--text-muted); }
+
+.badge-category {
+    background: #f1f5f9;
+    color: var(--text-main);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.empty-row td { color: var(--text-muted); padding: 40px 0; }
+
+/* Financial Signposts Restrained Custom Accents */
+.tx-amount { font-weight: 600; }
+.tx-amount.positive { color: var(--primary); }
+.tx-amount.negative { color: var(--text-main); } /* Restrained Premium Neutrality for Costs */
+
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1100px) {
+    .workspace-layout { grid-template-columns: 1fr; }
+}

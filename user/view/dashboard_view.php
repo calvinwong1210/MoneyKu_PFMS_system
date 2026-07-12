@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PFMS - Dashboard</title>
+    <link rel="stylesheet" href="../css/user_sidebar.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -18,15 +19,6 @@
                 <h1>Welcome back, <?php echo htmlspecialchars($username); ?></h1>
                 <p>Here's your financial overview for today.</p>
             </div>
-        <a href="user_profile.php" class="user-profile-link" style="text-decoration: none; color: inherit;">
-            <div class="user-profile">
-                <div class="avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
-                <div class="info">
-                    <span class="name"><?php echo htmlspecialchars($username); ?></span>
-                    <span class="role"><?php echo ucfirst($role); ?></span>
-                </div>
-            </div>
-        </a>
         </header>
 
         <section class="cards-grid">

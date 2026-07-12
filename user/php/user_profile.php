@@ -13,7 +13,6 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
-// ==================== 动作：处理密码框或资料更新的 AJAX POST ====================
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
 
@@ -28,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
 
-    // 检查此用户是否已经有了 profile 记录
     $check_sql = "SELECT profile_id FROM user_profiles WHERE user_id = ?";
     $stmt = $conn->prepare($check_sql);
     $stmt->bind_param("i", $user_id);
@@ -38,12 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     $stmt->close();
 
     if ($has_profile) {
-        // 执行更新 UPDATE
         $update_sql = "UPDATE user_profiles SET full_name = ?, gender = ?, date_of_birth = ?, phone_number = ?, occupation = ? WHERE user_id = ?";
         $stmt = $conn->prepare($update_sql);
         $stmt->bind_param("sssssi", $full_name, $gender, $dob, $phone, $occupation, $user_id);
     } else {
-        // 执行创建 INSERT
         $insert_sql = "INSERT INTO user_profiles (user_id, full_name, gender, date_of_birth, phone_number, occupation) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_sql);
         $stmt->bind_param("isssss", $user_id, $full_name, $gender, $dob, $phone, $occupation);
@@ -59,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     exit;
 }
 
-// ==================== 初始化：拉取现有 Profile 数据展示 ====================
 $profile_sql = "SELECT full_name, gender, date_of_birth, phone_number, occupation, profile_picture FROM user_profiles WHERE user_id = ?";
 $stmt = $conn->prepare($profile_sql);
 $stmt->bind_param("i", $user_id);
@@ -68,7 +63,6 @@ $result = $stmt->get_result();
 $profile = $result->fetch_assoc();
 $stmt->close();
 
-// 如果数据库里还没有这条记录，定义默认空值，防止 HTML 报错
 if (!$profile) {
     $profile = [
         'full_name' => '',
