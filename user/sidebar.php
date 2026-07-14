@@ -21,8 +21,11 @@ $role = $_SESSION['role'] ?? 'Member';
         <a href="user_transaction.php" class="menu-item <?php echo ($current_page == 'user_transaction.php') ? 'active' : ''; ?>">
             <span class="icon">💸</span> Transactions
         </a>
-        <a href="#budgets" class="menu-item">
+        <a href="user_budget.php" class="menu-item <?php echo ($current_page == 'user_budget.php') ? 'active' : ''; ?>">
             <span class="icon">🎯</span> Budgets
+        </a>
+        <a href="user_saving_goal.php" class="menu-item <?php echo ($current_page == 'user_saving_goal.php') ? 'active' : ''; ?>">
+            <span class="icon">🎯</span> Savings
         </a>
         <a href="#analytics" class="menu-item">
             <span class="icon">📈</span> Analytics

@@ -179,7 +179,7 @@ body.dashboard-body {
     color: var(--text-muted); 
 }
 
-/* --- Sidebar Profile Card Styling --- */
+/* sidebar profile */
 .sidebar-profile {
     margin-top: auto;
     padding-top: 16px;
@@ -200,7 +200,7 @@ body.dashboard-body {
     background: #f1f5f9;
 }
 
-/* --- Toast Notification Popups --- */
+
 .toast {
     position: fixed;
     top: 24px;
@@ -225,7 +225,6 @@ body.dashboard-body {
     background: #ef4444; 
 }
 
-/* --- Responsive Adaptations --- */
 @media (max-width: 1024px) {
     .cards-grid { grid-template-columns: 1fr; }
 }

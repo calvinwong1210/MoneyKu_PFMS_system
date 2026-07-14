@@ -1,7 +1,10 @@
 <?php
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
     require_once '../config/db_config.php';
 
@@ -85,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 <a href="forgot_password.php">Forgot Password?</a>
             </div>
             
-            <button type="submit" class="btn-submit" id="submitBtn">Sign In</button>
+            <button type="submit" class="btn-submit" id="submit_button">Sign In</button>
         </form>
 
         <p class="footer-text">
@@ -118,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault(); 
             
-            const btn = document.getElementById('submitBtn');
+            const btn = document.getElementById('submit_button');
             btn.disabled = true;
             btn.textContent = 'Verifying...';
 

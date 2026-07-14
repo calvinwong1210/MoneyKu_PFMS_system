@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. 安全拦截
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../../public/login.php");
     exit();
@@ -13,7 +12,10 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
 
     $full_name    = trim($_POST['full_name'] ?? '');
@@ -74,6 +76,5 @@ if (!$profile) {
     ];
 }
 
-// 3. 引入纯 HTML 视图层
 include '../view/user_profile_view.php';
 ?>

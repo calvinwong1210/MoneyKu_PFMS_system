@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFMS - Dashboard</title>
+    <title>MoneyKu - Dashboard</title>
     <link rel="stylesheet" href="../css/user_sidebar.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,34 +23,40 @@
 
         <section class="cards-grid">
             
+            <!-- Card 1: Total Balance -->
             <div class="metric-card">
                 <div class="card-header">
                     <span class="card-title">Total Balance</span>
                     <span class="card-icon-wrapper">💰</span>
                 </div>
-                <div class="card-value">$<?php echo number_format($mock_data['total_balance'], 2); ?></div>
-                <div class="card-trend up">
-                    <span class="trend-icon">↑</span> +12.4% <span class="trend-text">from last month</span>
+                <div class="card-value">RM <?php echo number_format($total_balance, 2); ?></div>
+                <div class="card-trend <?php echo $total_balance >= 0 ? 'up' : 'down'; ?>">
+                    <span class="trend-icon"><?php echo $total_balance >= 0 ? '↑' : '↓'; ?></span>
+                    Net Cashflow
                 </div>
             </div>
 
+            <!-- Card 2: This Month's Balance -->
             <div class="metric-card">
                 <div class="card-header">
-                    <span class="card-title">Monthly Expenses</span>
-                    <span class="card-icon-wrapper">📉</span>
+                    <span class="card-title">This Month's Balance</span>
+                    <span class="card-icon-wrapper">📈</span>
                 </div>
-                <div class="card-value">$<?php echo number_format($mock_data['monthly_spent'], 2); ?></div>
-                <div class="card-trend down">
-                    <span class="trend-icon">↓</span> -4.2% <span class="trend-text">vs average spending</span>
+                <div class="card-value">RM <?php echo number_format($monthly_balance, 2); ?></div>
+                <div class="card-trend <?php echo $monthly_balance >= 0 ? 'up' : 'down'; ?>">
+                    <span class="trend-icon"><?php echo $monthly_balance >= 0 ? '↑' : '↓'; ?></span>
+                    <?php echo date('F Y'); ?>
                 </div>
             </div>
 
+            <!-- Card 3: Savings Goal Progress -->
             <div class="metric-card">
                 <div class="card-header">
-                    <span class="card-title">Savings Goal</span>
+                    <span class="card-title">Savings Target: <?php echo htmlspecialchars($goal_name); ?></span>
+                    <a href="user_saving_goal.php" class="btn-text">View All</a>
                     <span class="card-icon-wrapper">🎯</span>
                 </div>
-                <div class="card-value">$<?php echo number_format($mock_data['savings_current'], 2); ?> <span class="target-total">/ $<?php echo number_format($mock_data['savings_target'], 0); ?></span></div>
+                <div class="card-value">RM <?php echo number_format($savings_current, 2); ?> <span class="target-total">/ RM <?php echo number_format($savings_target, 0); ?></span></div>
                 
                 <div class="progress-container">
                     <div class="progress-bar" style="width: <?php echo $savings_percentage; ?>%"></div>
@@ -60,12 +66,30 @@
                 </div>
             </div>
 
+            <!-- Card 4: Monthly Budget Summary -->
+            <div class="metric-card">
+                <div class="card-header">
+                    <span class="card-title">Monthly Budget</span>
+                    <a href="user_budget.php" class="btn-text">View All</a>
+                    <span class="card-icon-wrapper">🛡️</span>
+                </div>
+                <div class="card-value">RM <?php echo number_format($total_spent, 2); ?> <span class="target-total">/ RM <?php echo number_format($total_allocated, 0); ?></span></div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: <?php echo $budget_percentage; ?>%"></div>
+                </div>
+                <div class="progress-label">
+                    <span><?php echo $budget_percentage; ?>% Spent</span>
+                </div>
+            </div>
+
         </section>
 
+        <!-- Recent Transactions Log -->
         <section class="table-container">
             <div class="table-header">
                 <h2>Recent Transactions</h2>
-                <a href="#view-all" class="btn-text">View All</a>
+                <a href="user_transaction.php" class="btn-text">View All</a>
             </div>
             <table class="transaction-table">
                 <thead>
@@ -77,22 +101,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($mock_data['recent_transactions'] as $tx): ?>
-                    <tr>
-                        <td class="tx-date"><?php echo $tx['date']; ?></td>
-                        <td class="tx-desc"><?php echo htmlspecialchars($tx['desc']); ?></td>
-                        <td><span class="badge badge-category"><?php echo htmlspecialchars($tx['category']); ?></span></td>
-                        <td class="text-right tx-amount <?php echo $tx['amount'] < 0 ? 'negative' : 'positive'; ?>">
-                            <?php 
-                                if ($tx['amount'] < 0) {
-                                    echo '-$' . number_format(abs($tx['amount']), 2);
-                                } else {
-                                    echo '+$' . number_format($tx['amount'], 2);
-                                }
-                            ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                    <?php if (empty($recent_transactions)): ?>
+                        <tr class="empty-row"><td colspan="4" class="text-center">No transactions logged yet.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($recent_transactions as $tx): ?>
+                        <tr>
+                            <td class="tx-date"><?php echo $tx['transaction_date']; ?></td>
+                            <td class="tx-desc"><?php echo htmlspecialchars($tx['description'] ?: '—'); ?></td>
+                            <td><span class="badge badge-category"><?php echo htmlspecialchars($tx['category']); ?></span></td>
+                            <td class="text-right tx-amount <?php echo $tx['transaction_type'] === 'income' ? 'positive' : 'negative'; ?>">
+                                <?php 
+                                    if ($tx['transaction_type'] === 'income') {
+                                        echo '+RM' . number_format($tx['amount'], 2);
+                                    } else {
+                                        echo '-RM' . number_format($tx['amount'], 2);
+                                    }
+                                ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </section>

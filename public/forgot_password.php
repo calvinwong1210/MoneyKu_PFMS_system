@@ -6,7 +6,10 @@ require_once '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
     require_once '../config/db_config.php';
 
@@ -190,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 </span>
             </div>
             
-            <button type="submit" class="btn-submit" id="submitBtn">Reset Password</button>
+            <button type="submit" class="btn-submit" id="submit_button">Reset Password</button>
         </form>
 
         <p class="footer-text">
@@ -282,7 +285,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                 return;
             }
 
-            const btn = document.getElementById('submitBtn');
+            const btn = document.getElementById('submit_button');
             btn.disabled = true;
             btn.textContent = 'Resetting...';
 
