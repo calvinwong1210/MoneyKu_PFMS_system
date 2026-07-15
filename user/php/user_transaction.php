@@ -87,9 +87,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // Block manual updates to system-generated savings logs
-        if ($tx['category'] === 'Savings'|| $tx['category'] === 'Refund') {
-            echo json_encode(["status" => "error", "message" => "Cannot edit system-generated savings transactions manually!"]);
+        // Block manual updates to system-generated savings or loan logs
+        if ($tx['category'] === 'Savings' || $tx['category'] === 'Refund' || $tx['category'] === 'Student Loan') {
+            echo json_encode(["status" => "error", "message" => "Cannot edit system-generated savings or student loan transactions manually!"]);
             exit;
         }
 
@@ -150,9 +150,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        // Block manual deletion of system-generated savings or refund logs
-        if ($tx['category'] === 'Savings' || $tx['category'] === 'Refund') {
-            echo json_encode(["status" => "error", "message" => "Cannot delete system-generated savings or refund transactions manually!"]);
+        // Block manual deletion of system-generated savings, refund, or loan logs
+        if ($tx['category'] === 'Savings' || $tx['category'] === 'Refund' || $tx['category'] === 'Student Loan') {
+            echo json_encode(["status" => "error", "message" => "Cannot delete system-generated savings, refund, or student loan transactions manually!"]);
             exit;
         }
 

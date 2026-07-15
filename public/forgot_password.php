@@ -118,8 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         }
         $otp_stmt->close();
 
-        // 验证码正确，作废它
-        // update OTP as used
+        // otp is valid, mark it as used
         $update_otp_sql = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $update_otp_stmt = $conn->prepare($update_otp_sql);
         $update_otp_stmt->bind_param("i", $otp_row['id']);

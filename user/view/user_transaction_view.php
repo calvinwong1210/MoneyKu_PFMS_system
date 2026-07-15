@@ -86,7 +86,7 @@
                                 <?php foreach ($user_transactions as $tx): 
                                     $current_month = date('Y-m');
                                     $tx_month = date('Y-m', strtotime($tx['transaction_date']));
-                                    $can_modify = ($tx_month >= $current_month && $tx['category'] !== 'Savings' && $tx['category'] !== 'Refund');
+                                    $can_modify = ($tx_month >= $current_month && $tx['category'] !== 'Savings' && $tx['category'] !== 'Refund' && $tx['category'] !== 'Student Loan');
                                 ?>
                                 <tr>
                                     <td class="tx-date"><?php echo htmlspecialchars($tx['transaction_date']); ?></td>

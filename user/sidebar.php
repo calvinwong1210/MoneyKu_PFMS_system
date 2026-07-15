@@ -27,6 +27,9 @@ $role = $_SESSION['role'] ?? 'Member';
         <a href="user_saving_goal.php" class="menu-item <?php echo ($current_page == 'user_saving_goal.php') ? 'active' : ''; ?>">
             <span class="icon">🎯</span> Savings
         </a>
+        <a href="ptptn_dashboard.php" class="menu-item <?php echo ($current_page == 'ptptn_dashboard.php') ? 'active' : ''; ?>">
+            <span class="icon">🎓</span> PTPTN Loan
+        </a>
         <a href="#analytics" class="menu-item">
             <span class="icon">📈</span> Analytics
         </a>

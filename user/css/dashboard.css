@@ -146,6 +146,5 @@
 .text-right { text-align: right; }
 .tx-amount { font-weight: 600; }
 .tx-amount.positive { color: #10b981; }
-.tx-amount.negative { color: var(--text-main); } /* 支出不使用刺眼的纯红，保持黑色的高级克制感 */
-
+    .tx-amount.negative { color: var(--text-main); } /* expense uses black instead of bright red for a more restrained look */
 

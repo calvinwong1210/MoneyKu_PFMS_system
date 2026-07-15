@@ -21,6 +21,59 @@
             </div>
         </header>
 
+        <!-- Financial Health Score Section -->
+        <section class="health-score-container" style="margin-bottom: 32px;">
+            <div class="health-card" style="background: var(--card-bg); border: 1px solid var(--borders); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-md); display: flex; gap: 32px; align-items: center; flex-wrap: wrap;">
+                
+                <!-- Score SVG Meter -->
+                <div class="score-circle-wrapper" style="position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="140" height="140" viewBox="0 0 140 140" style="transform: rotate(-90deg);">
+                        <circle cx="70" cy="70" r="58" stroke="#f1f5f9" stroke-width="12" fill="transparent" />
+                        <circle cx="70" cy="70" r="58" stroke="<?php echo $health_color; ?>" stroke-width="12" fill="transparent" 
+                                stroke-dasharray="364.4" stroke-dashoffset="<?php echo 364.4 - (364.4 * $health_score / 100); ?>" 
+                                stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
+                    </svg>
+                    <div style="position: absolute; text-align: center;">
+                        <span style="font-size: 34px; font-weight: 800; color: var(--text-main); line-height: 1;"><?php echo $health_score; ?></span>
+                        <span style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 2px;">Score</span>
+                    </div>
+                </div>
+
+                <!-- Status Feedback & Advice -->
+                <div class="score-details" style="flex: 1; min-width: 280px;">
+                    <div style="margin-bottom: 8px;">
+                        <h2 style="font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main);">
+                            Financial Health Grade: <span style="color: <?php echo $health_color; ?>;"><?php echo $health_grade; ?></span>
+                        </h2>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.6;">
+                        <?php echo $health_advice; ?>
+                    </p>
+
+                    <!-- Breakdown metrics strip -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; border-top: 1px solid var(--borders); padding-top: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span><?php echo $balance_icon; ?></span>
+                            <span style="font-size: 13.5px; font-weight: 500; color: var(--text-main);">Savings Ratio: <strong style="color: <?php echo $balance_sub_color; ?>;"><?php echo $balance_score_text; ?></strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span><?php echo $budget_icon; ?></span>
+                            <span style="font-size: 13.5px; font-weight: 500; color: var(--text-main);">Budget Limits: <strong style="color: <?php echo $budget_sub_color; ?>;"><?php echo $budget_score_text; ?></strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span><?php echo $ptptn_icon; ?></span>
+                            <span style="font-size: 13.5px; font-weight: 500; color: var(--text-main);">PTPTN Repay: <strong style="color: <?php echo $ptptn_sub_color; ?>;"><?php echo $ptptn_score_text; ?></strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span><?php echo $saving_goal_icon; ?></span>
+                            <span style="font-size: 13.5px; font-weight: 500; color: var(--text-main);">Goal Progress: <strong style="color: <?php echo $saving_goal_sub_color; ?>;"><?php echo $saving_goal_score_text; ?></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
         <section class="cards-grid">
             
             <!-- Card 1: Total Balance -->
