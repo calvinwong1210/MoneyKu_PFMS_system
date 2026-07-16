@@ -18,7 +18,10 @@ $filter_month = isset($_GET['filter_month']) ? (int)$_GET['filter_month'] : $cur
 $filter_year  = isset($_GET['filter_year']) ? (int)$_GET['filter_year'] : $current_year;
 
 // --- AJAX Submission Engine ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
 
     $category      = $_POST['category'] ?? '';

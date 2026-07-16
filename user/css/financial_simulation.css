@@ -1,0 +1,316 @@
+/* --- Financial Simulation Workspace Stylesheet --- */
+
+.simulation-body {
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Tabs Styling --- */
+.tabs-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    background: #f1f5f9;
+    padding: 6px;
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.tab-btn {
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: var(--card-bg);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(148, 163, 184, 0.1);
+    color: var(--text-main);
+}
+
+/* --- Panels Controller --- */
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Simulation Grid --- */
+.simulation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 28px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .simulation-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.simulation-card {
+    background: var(--card-bg);
+    border: 1px solid var(--borders);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+}
+
+.simulation-card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+
+.simulation-card .subtitle {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin: 0 0 24px 0;
+}
+
+/* --- Loan Summary Row --- */
+.loan-quick-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--borders);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.sum-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.sum-item span {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.sum-item strong {
+    font-size: 18px;
+    color: var(--text-main);
+    margin-top: 4px;
+}
+
+/* --- Input elements --- */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--text-main);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--borders);
+    font-size: 14.5px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.btn-simulate {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-simulate:hover {
+    background: #059669;
+}
+
+/* --- Empty state --- */
+.empty-state-card {
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px solid var(--borders);
+    border-radius: 20px;
+    padding: 48px 24px;
+    box-shadow: var(--shadow-md);
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.empty-state-card h3 {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+}
+
+.empty-state-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+}
+
+.btn-redirect {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-redirect:hover {
+    background: #059669;
+}
+
+/* --- Simulation Outputs --- */
+.metrics-output-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.output-card {
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.output-card.success {
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.output-card .lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.output-card strong {
+    font-size: 24px;
+    color: #10b981;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+/* --- Comparisons Table --- */
+.comparisons-table-container h3 {
+    font-size: 15px;
+    margin: 0 0 12px 0;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--borders);
+}
+
+.comparison-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    background: #f8fafc;
+}
+
+.comparison-table td.highlight {
+    background: rgba(16, 185, 129, 0.02);
+    color: #10b981;
+}
+
+.comparison-table th.highlight {
+    background: rgba(16, 185, 129, 0.05);
+    color: #10b981;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+/* --- Risk Indicator Banner --- */
+.risk-indicator-banner {
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* --- Timeline Insight Table --- */
+.timeline-insights h3 {
+    font-size: 15px;
+    margin: 0 0 12px 0;
+}
+
+.insight-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--borders);
+    font-size: 13.5px;
+}
+
+.insight-row span {
+    color: var(--text-muted);
+}
+
+.insight-row strong {
+    color: var(--text-main);
+    font-weight: 600;
+}

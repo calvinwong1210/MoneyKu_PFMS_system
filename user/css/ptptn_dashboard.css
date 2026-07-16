@@ -542,3 +542,8 @@ h2 {
     border-style: solid;
     border-color: #1e293b transparent transparent transparent;
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+}

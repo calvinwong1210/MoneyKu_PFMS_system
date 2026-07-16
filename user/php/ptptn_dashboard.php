@@ -10,7 +10,10 @@ require_once '../../config/db_config.php';
 $user_id = $_SESSION['user_id'];
 
 // --- AJAX Form Submission Engine ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
 
     $action = $_POST['action'] ?? '';
@@ -142,21 +145,58 @@ if ($has_loan) {
         $unpaid_percentage = round(($remaining_balance / $total_loan) * 100, 1);
     }
 
-    // check paid or not before 27th
-    $day_of_month = (int)date('d');
-    if ($day_of_month > 27 && $remaining_balance > 0) {
-        $month_check_sql = "SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND DATE_FORMAT(payment_date, '%Y-%m') = ?";
-        $m_stmt = $conn->prepare($month_check_sql);
-        $this_month = date('Y-m');
-        $m_stmt->bind_param("is", $loan_profile['loan_id'], $this_month);
-        $m_stmt->execute();
-        $has_paid_this_month = ($m_stmt->get_result()->num_rows > 0);
-        $m_stmt->close();
+    // Find all calendar months from repayment_start_date to current month
+    $start_date = $loan_profile['repayment_start_date'];
+    $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
+    $current_ts = strtotime(date('Y-m-01'));
+    
+    $unpaid_months = [];
+    $temp_ts = $start_ts;
+    
+    while ($temp_ts <= $current_ts) {
+        $month_str = date('Y-m', $temp_ts);
+        
+        $chk_stmt = $conn->prepare("SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
+        $chk_stmt->bind_param("iss", $loan_profile['loan_id'], $month_str, $month_str);
+        $chk_stmt->execute();
+        $has_record = ($chk_stmt->get_result()->num_rows > 0);
+        $chk_stmt->close();
+        
+        if (!$has_record) {
+            $unpaid_months[] = $month_str;
+        }
+        
+        $temp_ts = strtotime("+1 month", $temp_ts);
+    }
 
-        if (!$has_paid_this_month) {
-            $show_due_warning = true;
+    $current_month_str = date('Y-m');
+    $day_of_month = (int)date('d');
+    
+    $has_past_due = false;
+    $current_month_unpaid = false;
+    
+    foreach ($unpaid_months as $m) {
+        if ($m < $current_month_str) {
+            $has_past_due = true;
+        }
+        if ($m === $current_month_str) {
+            $current_month_unpaid = true;
         }
     }
+    
+    // Warn if they missed past months or missed current month and past the 27th
+    if (($has_past_due || ($current_month_unpaid && $day_of_month > 27)) && $remaining_balance > 0) {
+        $show_due_warning = true;
+    }
+
+    // Calculate overdue debt (from past elapsed months only)
+    $past_unpaid_count = 0;
+    foreach ($unpaid_months as $m) {
+        if ($m < $current_month_str) {
+            $past_unpaid_count++;
+        }
+    }
+    $overdue_debt = $past_unpaid_count * (float)$loan_profile['monthly_payment'];
 }
 $conn->close();
 

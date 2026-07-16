@@ -22,7 +22,7 @@ $role = $_SESSION['role'] ?? 'Member';
             <span class="icon">💸</span> Transactions
         </a>
         <a href="user_budget.php" class="menu-item <?php echo ($current_page == 'user_budget.php') ? 'active' : ''; ?>">
-            <span class="icon">🎯</span> Budgets
+            <span class="icon">💰</span> Budgets
         </a>
         <a href="user_saving_goal.php" class="menu-item <?php echo ($current_page == 'user_saving_goal.php') ? 'active' : ''; ?>">
             <span class="icon">🎯</span> Savings
@@ -30,8 +30,8 @@ $role = $_SESSION['role'] ?? 'Member';
         <a href="ptptn_dashboard.php" class="menu-item <?php echo ($current_page == 'ptptn_dashboard.php') ? 'active' : ''; ?>">
             <span class="icon">🎓</span> PTPTN Loan
         </a>
-        <a href="#analytics" class="menu-item">
-            <span class="icon">📈</span> Analytics
+        <a href="financial_simulation.php" class="menu-item <?php echo ($current_page == 'financial_simulation.php') ? 'active' : ''; ?>">
+            <span class="icon">🧪</span> Simulation
         </a>
     </nav>
     <div class="sidebar-profile">

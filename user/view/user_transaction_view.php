@@ -193,7 +193,7 @@
     <!-- AJAX Form Controller AJAX Operations -->
     <script>
         const incomeCategories = ["Salary", "Bonus", "Business", "Investment", "Allowance", "Gift", "Others"];
-        const expenseCategories = ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Healthcare", "Education", "Housing", "Insurance", "Travel", "Student Loan", "Others"];
+        const expenseCategories = ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Healthcare", "Education", "Housing", "Insurance", "Travel", "Loan", "Others"];
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');

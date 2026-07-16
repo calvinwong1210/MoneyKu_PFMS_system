@@ -34,9 +34,18 @@
             
             <section class="form-card">
                 <h2>Standard Monthly Repayment</h2>
-                <p class="period-tracker-lbl">Current Month: <strong><?php echo date('F Y'); ?></strong></p>
+                <?php if ($has_past_unpaid): ?>
+                    <p class="period-tracker-lbl" style="color: #dc2626; font-weight: 600;">
+                        Target Period: <span style="background: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 13px; border: 1px solid #fee2e2;">Outstanding Balance Clearance</span>
+                    </p>
+                    <div style="background: rgba(220, 38, 38, 0.05); border: 1px solid rgba(220, 38, 38, 0.15); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-size: 13px; color: #b91c1c; line-height: 1.5;">
+                        ⚠️ You have previous unpaid balances. Payments will clear older balances first before covering the current month (<strong><?php echo date('F Y'); ?></strong>).
+                    </div>
+                <?php else: ?>
+                    <p class="period-tracker-lbl">Current Month: <strong><?php echo date('F Y'); ?></strong></p>
+                <?php endif; ?>
                 
-                <?php if ($already_paid_this_month): ?>
+                <?php if ($already_paid_this_month && !$has_past_unpaid): ?>
                     <div class="success-status-tag">✓ Monthly Repayment Paid</div>
                 <?php else: ?>
                     <form id="standardRepaymentForm">
@@ -66,11 +75,22 @@
                                 <tr><td colspan="3" class="text-center empty-msg">No repayment records logged yet.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($records as $r): ?>
-                                    <tr>
-                                        <td class="tx-date"><?php echo date('M d, Y', strtotime($r['payment_date'])); ?></td>
-                                        <td class="tx-amt">RM <?php echo number_format($r['payment_amount'], 2); ?></td>
-                                        <td class="text-middle tx-bal">RM <?php echo number_format($r['remaining_balance'], 2); ?></td>
-                                    </tr>
+                                     <tr>
+                                         <td class="tx-date">
+                                             <?php echo date('M d, Y', strtotime($r['payment_date'])); ?>
+                                             <?php if (!empty($r['target_month'])): ?>
+                                                 <span class="target-month-hint" style="font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;">
+                                                     For <?php echo date('M Y', strtotime($r['target_month'] . '-01')); ?>
+                                                 </span>
+                                             <?php else: ?>
+                                                 <span class="target-month-hint" style="font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;">
+                                                     Prior Override
+                                                 </span>
+                                             <?php endif; ?>
+                                         </td>
+                                         <td class="tx-amt">RM <?php echo number_format($r['payment_amount'], 2); ?></td>
+                                         <td class="text-right tx-bal">RM <?php echo number_format($r['remaining_balance'], 2); ?></td>
+                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>

@@ -129,7 +129,15 @@
                 <div class="card-value">RM <?php echo number_format($total_spent, 2); ?> <span class="target-total">/ RM <?php echo number_format($total_allocated, 0); ?></span></div>
                 
                 <div class="progress-container">
-                    <div class="progress-bar" style="width: <?php echo $budget_percentage; ?>%"></div>
+                    <div class="progress-bar" style="width: <?php echo $budget_percentage; ?>%; background: <?php 
+                        if ($budget_percentage < 50) {
+                            echo '#10b981';
+                        } elseif ($budget_percentage < 85) {
+                            echo '#eab308';
+                        } else {
+                            echo '#f43f5e';
+                        }
+                    ?>;"></div>
                 </div>
                 <div class="progress-label">
                     <span><?php echo $budget_percentage; ?>% Spent</span>

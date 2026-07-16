@@ -114,6 +114,9 @@
                             </strong>
                         </div>
                         <div class="detail-row"><span>Monthly Repayment Amount: </span><strong>RM <?php echo number_format($loan_profile['monthly_payment'], 2); ?></strong></div>
+                        <?php if (isset($overdue_debt) && $overdue_debt > 0): ?>
+                            <div class="detail-row"><span style="color: #dc2626; font-weight: 600;">Overdue Balance: </span><strong style="color: #dc2626;">RM <?php echo number_format($overdue_debt, 2); ?></strong></div>
+                        <?php endif; ?>
                     </div>
                 </section>
 
@@ -240,9 +243,9 @@
                 </div>
                 <div class="modal-body" style="margin-bottom: 24px;">
                     <p style="font-size: 14.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
-                        You have passed the 10th of <?php echo date('F Y'); ?> and have not paid your monthly PTPTN repayment yet.
+                        You have unpaid monthly repayments or have passed the 27th of <?php echo date('F Y'); ?> without payment.
                     </p>
-                    <p style="font-size: 13.5px; color: #b45309; font-weight: 500; margin: 0;">
+                    <p style="font-size: 13.5px; color: #dc2626; font-weight: 600; margin: 0;">
                         Please pay as soon as possible to avoid penalties.
                     </p>
                 </div>
@@ -267,7 +270,7 @@
                 <form id="editMonthsForm">
                     <input type="hidden" name="action" value="edit_months">
                     <div class="form-group" style="margin-top: 12px;">
-                        <input type="number" id="edit_period_months" name="repayment_period_months" step="12" value="<?php echo $loan_profile['repayment_period_months']; ?>" required>
+                        <input type="number" id="edit_period_months" name="repayment_period_months" step="12" value="<?php echo $loan_profile['repayment_period_months']; ?>" onkeydown="return false;" required>
                         <label for="edit_period_months">New Repayment Period (Months)</label>
                     </div>
                     <button type="submit" class="btn-submit" id="saveMonthsBtn">Save Changes</button>

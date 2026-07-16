@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="number" id="budget_amount" name="budget_amount" step="0.01" min="1" placeholder=" " required>
+                        <input type="number" id="budget_amount" name="budget_amount" step="0.01" min="0" placeholder=" " required>
                         <label for="budget_amount">Monthly Budget Limit (RM)</label>
                     </div>
 
