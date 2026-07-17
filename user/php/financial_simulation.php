@@ -12,15 +12,16 @@ $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
 // --- AJAX POST SIMULATION PROCESSOR ENGINE ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" 
+&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
+{
     header('Content-Type: application/json');
     
     $action = $_POST['action'] ?? '';
     
-    /* -------------------------------------------------------------------------- */
-    /* Simulation Module 1: PTPTN Early Repayment Simulation                     */
-    /* Used for calculating interest and duration savings from extra repayments.  */
-    /* -------------------------------------------------------------------------- */
+    // Simulation  1: PTPTN Early Repayment Simulation                     
+    // Handles inputs for PTPTN loan amortization speed calculations. 
     if ($action === 'simulate_ptptn') {
         $extra_amount = filter_var($_POST['extra_amount'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
         
@@ -72,10 +73,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
     
-    /* -------------------------------------------------------------------------- */
-    /* Simulation Module 2: Can I Afford This? Spending Impact Calculator         */
-    /* Used for checking liquidity and savings percentage impact of a purchase.  */
-    /* -------------------------------------------------------------------------- */
+    // Simulation 2: Can I Afford This? Spending Impact Calculator        
+    // Handles input forms and output details for purchase liquidity checking.   
     if ($action === 'simulate_affordability') {
         $item_name = trim($_POST['item_name'] ?? '');
         $item_price = filter_var($_POST['item_price'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
@@ -222,10 +221,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
     
-    /* -------------------------------------------------------------------------- */
-    /* Simulation Module 3: Savings Goal Simulator                               */
-    /* Used for calculating months required and comparing saving plan packages.  */
-    /* -------------------------------------------------------------------------- */
+    // Simulation 3: Savings Goal Simulator                              
+    // Handles target amount, current savings, and contributions timeline.       
     if ($action === 'simulate_savings_goal') {
         $target = filter_var($_POST['target_amount'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
         $current = filter_var($_POST['current_savings'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
@@ -283,10 +280,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
     
-    /* -------------------------------------------------------------------------- */
-    /* Simulation Module 4: Financial Health Score Simulation                     */
-    /* Used for calculating simulated overall health score out of 100.           */
-    /* -------------------------------------------------------------------------- */
+    // Simulation 4: Financial Health Score Simulation                    
+    // Handles income, expense, and budget adjustments to show simulated scores.  
     if ($action === 'simulate_health_score') {
         $sim_income = filter_var($_POST['sim_income'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
         $sim_expense = filter_var($_POST['sim_expense'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;

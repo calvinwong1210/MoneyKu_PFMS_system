@@ -23,7 +23,7 @@
         <!-- Simulation Tabs Navigation -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab('ptptn-tab')">🎓 PTPTN Simulator</button>
-            <button class="tab-btn" onclick="switchTab('afford-tab')">🛍️ Affordability Checker</button>
+            <button class="tab-btn" onclick="switchTab('afford-tab')">🛍️ Can I Afford It?</button>
             <button class="tab-btn" onclick="switchTab('savings-tab')">🎯 Savings Planner</button>
             <button class="tab-btn" onclick="switchTab('health-tab')">🩺 Health Score Simulator</button>
         </div>
@@ -31,10 +31,8 @@
         <!-- Simulation Panels -->
         <div class="panels-container">
             
-            <!-- ========================================================================== -->
-            <!-- Simulation Module 1: PTPTN Early Repayment Simulation                      -->
-            <!-- Handles inputs for PTPTN loan amortization speed calculations.            -->
-            <!-- ========================================================================== -->
+            <!-- Simulation  1: PTPTN Early Repayment Simulation                     
+            Handles inputs for PTPTN loan amortization speed calculations. -->
             <div id="ptptn-tab" class="tab-panel active">
                 <?php if (!$has_loan): ?>
                     <div class="empty-state-card">
@@ -121,14 +119,12 @@
                 <?php endif; ?>
             </div>
 
-            <!-- ========================================================================== -->
-            <!-- Simulation Module 2: Can I Afford This? Spending Impact Calculator         -->
-            <!-- Handles input forms and output details for purchase liquidity checking.   -->
-            <!-- ========================================================================== -->
+            <!-- Simulation 2: Can I Afford This? Spending Impact Calculator        
+            Handles input forms and output details for purchase liquidity checking.   -->
             <div id="afford-tab" class="tab-panel">
                 <div class="simulation-grid">
                     <section class="simulation-card input-section">
-                        <h2>Purchase Analyzer</h2>
+                        <h2>Purchase Analyser</h2>
                         <p class="subtitle">Enter the item details to test if you can afford it immediately without risking deficit.</p>
                         
                         <div class="loan-quick-summary" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
@@ -192,10 +188,8 @@
                 </div>
             </div>
 
-            <!-- ========================================================================== -->
-            <!-- Simulation Module 3: Savings Goal Simulator                               -->
-            <!-- Handles target amount, current savings, and contributions timeline.       -->
-            <!-- ========================================================================== -->
+            <!-- Simulation 3: Savings Goal Simulator                              
+            Handles target amount, current savings, and contributions timeline.       -->
             <div id="savings-tab" class="tab-panel">
                 <div class="simulation-grid">
                     <section class="simulation-card input-section">
@@ -257,10 +251,8 @@
                 </div>
             </div>
 
-            <!-- ========================================================================== -->
-            <!-- Simulation Module 4: Financial Health Score Simulation                     -->
-            <!-- Handles income, expense, and budget adjustments to show simulated scores.  -->
-            <!-- ========================================================================== -->
+            <!-- Simulation 4: Financial Health Score Simulation                    
+            Handles income, expense, and budget adjustments to show simulated scores.  -->
             <div id="health-tab" class="tab-panel">
                 <div class="simulation-grid">
                     <section class="simulation-card input-section">

@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $mail->addAddress($email);
 
             $mail->isHTML(true);
-            $mail->Subject = '【MoneyKu】Reset Your Password OTP Code';
+            $mail->Subject = '[MoneyKu] Reset Your Password OTP Code';
             $mail->Body    = "Hello! You requested to reset your password. Your OTP code is: <b style='font-size: 24px; color: #dc3545;'>{$otp}</b>. It expires in 5 minutes. If you did not request this, please ignore this email.";
             $mail->AltBody = "Hello! Your OTP code is: {$otp}. It expires in 5 minutes.";
 

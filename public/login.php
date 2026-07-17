@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         exit;
     }
 
-    $login_sql = "SELECT user_id, username, password_hash, role, account_status FROM users WHERE username = ? OR email = ?";
+    $login_sql = "SELECT u.user_id, u.username, u.password_hash, u.role, u.account_status, p.profile_picture FROM users u LEFT JOIN user_profiles p ON u.user_id = p.user_id WHERE u.username = ? OR u.email = ?";
     $stmt = $conn->prepare($login_sql);
     $stmt->bind_param("ss", $username_or_email, $username_or_email);
     $stmt->execute();
@@ -31,8 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['profile_picture'] = $user['profile_picture'];
 
-            echo json_encode(["status" => "success", "message" => "Login successful! Redirecting..."]);
+            echo json_encode(["status" => "success", "message" => "Login successful! Redirecting...", "role" => $user['role']]);
         } else {
             echo json_encode(["status" => "error", "message" => "Invalid credentials!"]);
         }
@@ -136,7 +137,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             .then(data => {
                 if(data.status === 'success') {
                     showToast(data.message, 'success');
-                    setTimeout(() => { window.location.href = '../user/php/dashboard.php'; }, 1000);
+                    setTimeout(() => { 
+                        if (data.role === 'admin') {
+                            window.location.href = '../admin/php/admin_dashboard.php';
+                        } else {
+                            window.location.href = '../user/php/dashboard.php';
+                        }
+                    }, 1000);
                 } else {
                     showToast(data.message, 'error');
                     btn.disabled = false;

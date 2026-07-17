@@ -1,134 +1,21 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../public/login.php");
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
     exit();
 }
 
 require_once '../../config/db_config.php';
-
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" 
-&& isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
-&& $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') 
-{
+// --- AJAX POST PROCESSOR ---
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
 
     $action = $_POST['action'] ?? '';
-
-    // Handle Account Deletion
-    if ($action === 'delete_account') {
-        $password = $_POST['password'] ?? '';
-        if (empty($password)) {
-            echo json_encode(["status" => "error", "message" => "Password is required to delete account!"]);
-            exit;
-        }
-
-        // Fetch user password hash
-        $pwd_sql = "SELECT password_hash FROM users WHERE user_id = ?";
-        $stmt = $conn->prepare($pwd_sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        if ($res->num_rows !== 1) {
-            echo json_encode(["status" => "error", "message" => "User not found."]);
-            exit;
-        }
-        $user_row = $res->fetch_assoc();
-        $stmt->close();
-
-        // Verify password
-        if (!password_verify($password, $user_row['password_hash'])) {
-            echo json_encode(["status" => "error", "message" => "Incorrect password! Account deletion aborted."]);
-            exit;
-        }
-
-        // Start database transaction
-        $conn->begin_transaction();
-        try {
-            // 1. Get loan_id to delete repayment records
-            $loan_id = null;
-            $loan_stmt = $conn->prepare("SELECT loan_id FROM student_loans WHERE user_id = ?");
-            $loan_stmt->bind_param("i", $user_id);
-            $loan_stmt->execute();
-            $loan_res = $loan_stmt->get_result();
-            if ($loan_row = $loan_res->fetch_assoc()) {
-                $loan_id = $loan_row['loan_id'];
-            }
-            $loan_stmt->close();
-
-            if ($loan_id) {
-                // Delete repayment records
-                $del_repayment = $conn->prepare("DELETE FROM repayment_records WHERE loan_id = ?");
-                $del_repayment->bind_param("i", $loan_id);
-                $del_repayment->execute();
-                $del_repayment->close();
-
-                // Delete student loan
-                $del_loan = $conn->prepare("DELETE FROM student_loans WHERE user_id = ?");
-                $del_loan->bind_param("i", $user_id);
-                $del_loan->execute();
-                $del_loan->close();
-            }
-
-            // 2. Delete budgets
-            $del_budgets = $conn->prepare("DELETE FROM user_budgets WHERE user_id = ?");
-            $del_budgets->bind_param("i", $user_id);
-            $del_budgets->execute();
-            $del_budgets->close();
-
-            // 3. Delete savings goals
-            $del_goals = $conn->prepare("DELETE FROM user_savings_goals WHERE user_id = ?");
-            $del_goals->bind_param("i", $user_id);
-            $del_goals->execute();
-            $del_goals->close();
-
-            // 4. Delete transactions
-            $del_trans = $conn->prepare("DELETE FROM user_transactions WHERE user_id = ?");
-            $del_trans->bind_param("i", $user_id);
-            $del_trans->execute();
-            $del_trans->close();
-
-            // 5. Delete profile picture file from disk
-            $pic_stmt = $conn->prepare("SELECT profile_picture FROM user_profiles WHERE user_id = ?");
-            $pic_stmt->bind_param("i", $user_id);
-            $pic_stmt->execute();
-            $pic_res = $pic_stmt->get_result();
-            if ($pic_row = $pic_res->fetch_assoc()) {
-                $avatar_file = $pic_row['profile_picture'];
-                if (!empty($avatar_file) && file_exists('../uploads/avatars/' . $avatar_file)) {
-                    unlink('../uploads/avatars/' . $avatar_file);
-                }
-            }
-            $pic_stmt->close();
-
-            // 6. Delete profile
-            $del_prof = $conn->prepare("DELETE FROM user_profiles WHERE user_id = ?");
-            $del_prof->bind_param("i", $user_id);
-            $del_prof->execute();
-            $del_prof->close();
-
-            // 7. Delete user
-            $del_user = $conn->prepare("DELETE FROM users WHERE user_id = ?");
-            $del_user->bind_param("i", $user_id);
-            $del_user->execute();
-            $del_user->close();
-
-            $conn->commit();
-            session_destroy();
-
-            echo json_encode(["status" => "success", "message" => "Your account has been deleted successfully!"]);
-        } catch (Exception $e) {
-            $conn->rollback();
-            echo json_encode(["status" => "error", "message" => "Database error during deletion: " . $e->getMessage()]);
-        }
-        $conn->close();
-        exit;
-    }
 
     // Handle Password Change
     if ($action === 'change_password') {
@@ -151,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             exit;
         }
 
-        // Fetch user password hash
+        // Fetch current password hash
         $pwd_sql = "SELECT password_hash FROM users WHERE user_id = ?";
         $stmt = $conn->prepare($pwd_sql);
         $stmt->bind_param("i", $user_id);
@@ -210,7 +97,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (in_array($fileExtension, $allowedExtensions)) {
             if ($fileSize <= 5 * 1024 * 1024) {
-                $newFileName = 'avatar_' . $user_id . '_' . time() . '.' . $fileExtension;
+                // Save avatars in admin/uploads/avatars/ or user/uploads/avatars/? Let's keep them in admin/uploads/avatars/ to isolate admin assets
+                $newFileName = 'admin_avatar_' . $user_id . '_' . time() . '.' . $fileExtension;
                 $uploadFileDir = '../uploads/avatars/';
                 
                 if (!is_dir($uploadFileDir)) {
@@ -292,6 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
     exit;
 }
 
+// Fetch current admin profile info
 $profile_sql = "SELECT u.email, p.full_name, p.gender, p.date_of_birth, p.occupation, p.profile_picture FROM users u LEFT JOIN user_profiles p ON u.user_id = p.user_id WHERE u.user_id = ?";
 $stmt = $conn->prepare($profile_sql);
 $stmt->bind_param("i", $user_id);
@@ -316,5 +205,7 @@ if (!$profile) {
     if ($profile['occupation'] === null) $profile['occupation'] = '';
 }
 
-include '../view/user_profile_view.php';
+$conn->close();
+
+include '../view/admin_profile_view.php';
 ?>

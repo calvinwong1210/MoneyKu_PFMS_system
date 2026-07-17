@@ -37,7 +37,13 @@ $role = $_SESSION['role'] ?? 'Member';
     <div class="sidebar-profile">
         <a href="user_profile.php" class="sidebar-profile-link" style="text-decoration: none; color: inherit; display: block; width: 100%;">
             <div class="user-profile">
-                <div class="avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
+                <div class="avatar">
+                    <?php if (!empty($_SESSION['profile_picture']) && file_exists(__DIR__ . '/uploads/avatars/' . $_SESSION['profile_picture'])): ?>
+                        <img src="../uploads/avatars/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" class="avatar-img" alt="Avatar">
+                    <?php else: ?>
+                        <?php echo strtoupper(substr($username, 0, 1)); ?>
+                    <?php endif; ?>
+                </div>
                 <div class="info">
                     <span class="name"><?php echo htmlspecialchars($username); ?></span>
                     <span class="role"><?php echo ucfirst($role); ?></span>
