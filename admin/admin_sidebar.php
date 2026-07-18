@@ -6,18 +6,19 @@ $role = $_SESSION['role'] ?? 'admin';
 $profile_picture = $_SESSION['profile_picture'] ?? '';
 ?>
 <aside class="sidebar">
-    <div class="sidebar-brand">
-        <span class="logo-icon">🛡️</span>
-        <span class="brand-name">MoneyKu <span class="badge">Admin</span></span>
+    <div class="logo">
+        <a href="admin_dashboard.php">
+            <img src="../../images/admin_logo.png" alt="PFMS Logo" class="logo-img">
+        </a>
     </div>
-    <nav class="sidebar-menu">
+    <nav class="menu">
         <a href="admin_dashboard.php" class="menu-item <?php echo ($current_page == 'admin_dashboard.php') ? 'active' : ''; ?>">
             <span class="icon">📊</span> Dashboard
         </a>
-        <a href="register_admin.php" class="menu-item <?php echo ($current_page == 'register_admin.php') ? 'active' : ''; ?>">
+        <a href="admin_register.php" class="menu-item <?php echo ($current_page == 'admin_register.php') ? 'active' : ''; ?>">
             <span class="icon">➕</span> Register Admin
         </a>
-        <a href="ban_account.php" class="menu-item <?php echo ($current_page == 'ban_account.php') ? 'active' : ''; ?>">
+        <a href="admin_ban_account.php" class="menu-item <?php echo ($current_page == 'admin_ban_account.php') ? 'active' : ''; ?>">
             <span class="icon">🚫</span> Ban Account
         </a>
         <a href="admin_feedback.php" class="menu-item <?php echo ($current_page == 'admin_feedback.php') ? 'active' : ''; ?>">

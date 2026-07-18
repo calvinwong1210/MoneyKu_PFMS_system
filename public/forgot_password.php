@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
-            $mail->setFrom('moneyku6666@gmail.com', 'MoneyKu');
+            $mail->setFrom('moneyku6666@gmail.com', 'MoneyKu Administration');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
@@ -86,6 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
 
         if (empty($email) || empty($new_password) || empty($confirm_password) || empty($user_otp)) {
             echo json_encode(["status" => "error", "message" => "All fields are required!"]);
+            exit;
+        }
+
+        if (strlen($new_password) < 6) {
+            echo json_encode(["status" => "error", "message" => "Password must be at least 6 characters long!"]);
             exit;
         }
 
@@ -177,7 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             </div>
             
             <div class="form-group password-wrapper">
-                <input type="password" id="new_password" name="new_password" placeholder=" " required>
+                <input type="password" id="new_password" name="new_password" placeholder=" " required minlength="6">
                 <label for="new_password">New Password</label>
                 <span class="toggle-password" id="toggleNewPassword" style="z-index: 10;">
                     <img src="../images/hide_password.png" alt="Toggle Password">
@@ -185,7 +190,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             </div>
             
             <div class="form-group password-wrapper">
-                <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required minlength="6">
                 <label for="confirm_password">Confirm Password</label>
                 <span class="toggle-password" id="toggleConfirmPassword" style="z-index: 10;">
                     <img src="../images/hide_password.png" alt="Toggle Password">

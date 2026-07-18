@@ -252,7 +252,8 @@ body.dashboard-body {
 }
 
 /* --- Tablet Layout (576px to 991.98px) --- */
-@media (min-width: 576px) and (max-width: 991.98px) {
+@media (min-width: 576px) and (max-width: 991.98px) 
+{
     body.dashboard-body, body.simulation-body, body {
         flex-direction: column !important;
     }

@@ -6,7 +6,7 @@
     <title>Register Admin - MoneyKu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/admin_sidebar.css">
-    <link rel="stylesheet" href="../css/register_admin.css">
+    <link rel="stylesheet" href="../css/admin_register.css">
 </head>
 <body>
 
@@ -111,7 +111,7 @@
 
             const formData = new FormData(this);
 
-            fetch('register_admin.php', {
+            fetch('admin_register.php', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }

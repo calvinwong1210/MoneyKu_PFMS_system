@@ -16,7 +16,7 @@
         <header class="main-header">
             <div class="welcome-text">
                 <h1>Financial Simulation Laboratory</h1>
-                <p>Simulate loan acceleration plans, analyze purchase affordability, plan savings goals, and model financial health scoring.</p>
+                <p>Simulate loan payment options, check purchase affordability, plan savings goals, and view your financial health score.</p>
             </div>
         </header>
 
@@ -39,7 +39,7 @@
                         <div class="empty-icon">🎓</div>
                         <h3>No PTPTN Loan Profile Configured</h3>
                         <p>You need to set up your PTPTN student loan details first before you can run repayment simulations.</p>
-                        <a href="ptptn_dashboard.php" class="btn-redirect">Configure Loan Profile Now</a>
+                        <a href="ptptn_dashboard.php" class="btn-redirect">Add Loan Profile Now</a>
                     </div>
                 <?php else: ?>
                     <div class="simulation-grid">
@@ -59,7 +59,7 @@
                                     <label for="extra_amount_input" style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block; color: var(--text-main);">
                                         Extra Monthly Repayment (RM):
                                     </label>
-                                    <input type="number" id="extra_amount_input" name="extra_amount" step="10" min="10" max="2000" value="100" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--borders); font-size: 15px; font-weight: 600;" oninput="syncSlider(this.value)">
+                                    <input type="number" id="extra_amount_input" name="extra_amount" step="0.01" min="1" max="2000"  style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--borders); font-size: 15px; font-weight: 600;" oninput="syncSlider(this.value)">
                                 </div>
                                 
                                 <div class="form-group" style="margin-top: 16px;">
@@ -145,7 +145,7 @@
                                 <input type="number" id="item_price" name="item_price" step="0.01" min="1" placeholder="e.g. 3500.00" required>
                             </div>
                             
-                            <button type="submit" class="btn-simulate" id="btnAffordSim">Analyze Purchase Impact</button>
+                            <button type="submit" class="btn-simulate" id="btnAffordSim">Analyse Purchase Impact</button>
                         </form>
                     </section>
                     
@@ -201,17 +201,17 @@
                             
                             <div class="form-group">
                                 <label for="target_amount">Target Savings Goal Amount (RM)</label>
-                                <input type="number" id="target_amount" name="target_amount" step="100" min="100" placeholder="e.g. 10000" required>
+                                <input type="number" id="target_amount" name="target_amount" placeholder="e.g. 10000" step="0.01" min="0.00" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="current_savings">Current Existing Savings (RM)</label>
-                                <input type="number" id="current_savings" name="current_savings" step="100" min="0" placeholder="e.g. 2000" value="0">
+                                <input type="number" id="current_savings" name="current_savings" step="0.01" min="0.00" placeholder="e.g. 2000" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="monthly_savings">Monthly Contribution Ability (RM)</label>
-                                <input type="number" id="monthly_savings" name="monthly_savings" step="50" min="10" placeholder="e.g. 500" required>
+                                <input type="number" id="monthly_savings" name="monthly_savings" step="0.01" min="0.00"  placeholder="e.g. 500" required>
                             </div>
                             
                             <button type="submit" class="btn-simulate" id="btnSavingsSim">Simulate Goal Timeline</button>
@@ -220,7 +220,7 @@
                     
                     <section class="simulation-card results-section" id="savingsResults" style="display: none;">
                         <h2>Timeline Output</h2>
-                        <p class="subtitle">Timeline results and alternative package strategies to hit your target faster.</p>
+                        <p class="subtitle">Timeline results and different package strategies to hit your target faster.</p>
                         
                         <div class="metrics-output-grid" style="grid-template-columns: 1fr;">
                             <div class="output-card success" style="align-items: center; justify-content: center; text-align: center;">
@@ -230,20 +230,20 @@
                         </div>
                         
                         <div class="timeline-insights" style="margin-top: 20px;">
-                            <h3>Alternative Savings Scenarios</h3>
+                            <h3>Different Savings Scenarios</h3>
                             
                             <div class="insight-row">
-                                <span>Plan A: Accelerator Contribution (<strong>+20%</strong> = RM <span id="lblPlanAContrib">0</span>/mo)</span>
+                                <span>Option A: +20% Savings (<strong>+20%</strong> = RM <span id="lblPlanAContrib">0</span>/mo)</span>
                                 <div><strong id="outPlanAMonths" style="color: #10b981;">0 months</strong> <span style="font-size:12px; color: var(--text-muted);">(-<span id="outPlanASaved">0</span>m)</span></div>
                             </div>
                             
                             <div class="insight-row">
-                                <span>Plan B: Supercharger Contribution (<strong>+50%</strong> = RM <span id="lblPlanBContrib">0</span>/mo)</span>
+                                <span>Option B: +50% Savings (<strong>+50%</strong> = RM <span id="lblPlanBContrib">0</span>/mo)</span>
                                 <div><strong id="outPlanBMonths" style="color: #3b82f6;">0 months</strong> <span style="font-size:12px; color: var(--text-muted);">(-<span id="outPlanBSaved">0</span>m)</span></div>
                             </div>
                             
                             <div class="insight-row">
-                                <span>Plan C: Slower Pace Contribution (<strong>-20%</strong> = RM <span id="lblPlanCContrib">0</span>/mo)</span>
+                                <span>Option C: -20% Savings (<strong>-20%</strong> = RM <span id="lblPlanCContrib">0</span>/mo)</span>
                                 <div><strong id="outPlanCMonths" style="color: #ea580c;">0 months</strong> <span style="font-size:12px; color: var(--text-muted);">(+<span id="outPlanCExtra">0</span>m)</span></div>
                             </div>
                         </div>
@@ -264,12 +264,12 @@
                             
                             <div class="form-group">
                                 <label for="sim_income">Simulated Monthly Income (RM)</label>
-                                <input type="number" id="sim_income" name="sim_income" step="100" min="0" value="<?php echo max(1000, (float)$monthly_income); ?>" required>
+                                <input type="number" id="sim_income" name="sim_income" step="0.01" min="0" value="<?php echo max(0, (float)$monthly_income); ?>" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="sim_expense">Simulated Monthly Expense (RM)</label>
-                                <input type="number" id="sim_expense" name="sim_expense" step="100" min="0" value="<?php echo (float)$monthly_expense; ?>" required>
+                                <input type="number" id="sim_expense" name="sim_expense" step="0.01" min="0" value="<?php echo (float)$monthly_expense; ?>" required>
                             </div>
                             
                             <div class="form-group">
@@ -298,7 +298,7 @@
                             </div>
                             
                             <div class="form-group" style="margin-top: 24px;">
-                                <label for="sim_goal_progress">Simulated Savings Goal Progress (%)</label>
+                                <label for="sim_goal_progress">Simulated Savings Goal Progress (Due soon) (%)</label>
                                 <input type="range" id="sim_goal_progress" name="sim_goal_progress" min="0" max="100" step="5" value="<?php echo $savings_goal_prog >= 0 ? round($savings_goal_prog * 100) : 0; ?>" style="width: 100%; accent-color: var(--primary);" oninput="document.getElementById('lblGoalProg').innerText = this.value">
                                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 4px;">
                                     <span>0% (Started)</span>
@@ -374,7 +374,7 @@ function switchTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     
     // Find matching button to activate
-    const btnText = tabId === 'ptptn-tab' ? '🎓 PTPTN' : (tabId === 'afford-tab' ? '🛍️ Afford' : (tabId === 'savings-tab' ? '🎯 Savings' : '🩺 Health'));
+    const btnText = tabId === 'ptptn-tab' ? '🎓 PTPTN' : (tabId === 'afford-tab' ? '🛍️ Can I Afford It?' : (tabId === 'savings-tab' ? '🎯 Savings' : '🩺 Health'));
     document.querySelectorAll('.tab-btn').forEach(b => {
         if (b.innerText.includes(btnText)) {
             b.classList.add('active');
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
-                    btn.innerText = 'Analyze Purchase Impact';
+                    btn.innerText = 'Analyse Purchase Impact';
                     btn.disabled = false;
                     
                     try {
@@ -473,8 +473,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             badge.style.color = res.color;
                             
                             // Time constraints outputs
-                            document.getElementById('outTimeToSave').innerText = res.months_to_save === -1 ? 'Infinite (In Cashflow Deficit)' : res.months_to_save + ' months';
-                            document.getElementById('outTimeToRecover').innerText = res.months_to_recover === -1 ? 'Infinite (In Cashflow Deficit)' : res.months_to_recover + ' months';
+                            document.getElementById('outTimeToSave').innerText = res.months_to_save === -1 ? 'Not Available (Cash Flow Deficit)' : res.months_to_save + ' months';
+                            document.getElementById('outTimeToRecover').innerText = res.months_to_recover === -1 ? 'Not Available (Cash Flow Deficit)' : res.months_to_recover + ' months';
                             
                             // Health Score points impact display
                             const ptsBefore = document.getElementById('pointsBefore');

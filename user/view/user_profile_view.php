@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money'K'u - User Profile</title>
+    <title>MoneyKu - User Profile</title>
     <link rel="stylesheet" href="../css/user_sidebar.css">
     <link rel="stylesheet" href="../css/user_profile.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -399,7 +399,7 @@
                         input.type = 'password';
                         const wrapper = input.parentElement;
                         const img = wrapper.querySelector('.toggle-password-eye img');
-                        if (img) img.src = '../images/hide_password.png';
+                        if (img) img.src = '../../images/hide_password.png';
                     });
                 } else {
                     showToast(data.message, 'error');

@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group has-select">
-                        <input type="text" id="transaction_date" name="transaction_date" value="<?php echo date('Y-m-d'); ?>" readonly style="background: #f1f5f9; color: #94a3b8; cursor: not-allowed;">
+                        <input type="date" id="transaction_date" name="transaction_date" value="<?php echo date('Y-m-d'); ?>" required>
                         <label for="transaction_date">Date (Today)</label>
                     </div>
 
@@ -68,6 +68,50 @@
             <!-- Right Panel: Data Table Logs -->
             <section class="table-card">
                 <h2>Transaction History</h2>
+
+                <!-- Month, Year, and Category Filter Section -->
+                <div class="filter-section">
+                    <span class="filter-label">Filter:</span>
+                    <form method="GET" action="user_transaction.php" class="filter-form">
+                        <select name="filter_year" class="filter-select" onchange="this.form.submit()">
+                            <option value="">All Years</option>
+                            <?php foreach ($available_years as $year): ?>
+                                <option value="<?php echo $year; ?>" <?php echo $filter_year === $year ? 'selected' : ''; ?>>
+                                    <?php echo $year; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select name="filter_month" class="filter-select" onchange="this.form.submit()">
+                            <option value="">All Months</option>
+                            <?php
+                            $months = [
+                                1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+                                5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+                                9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+                            ];
+                            foreach ($months as $num => $name): ?>
+                                <option value="<?php echo $num; ?>" <?php echo $filter_month === $num ? 'selected' : ''; ?>>
+                                    <?php echo $name; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select name="filter_category" class="filter-select" onchange="this.form.submit()">
+                            <option value="">All Categories</option>
+                            <?php foreach ($available_categories as $cat): ?>
+                                <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $filter_category === $cat ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($cat); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <?php if ($filter_year !== null || $filter_month !== null || $filter_category !== null): ?>
+                            <a href="user_transaction.php" class="btn-clear-filters">Clear Filters</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
+
                 <div class="table-wrapper">
                     <table class="transaction-table" id="txTable">
                         <thead>
@@ -131,11 +175,11 @@
                 <?php if ($total_pages > 1): ?>
                     <div class="pagination">
                         <?php if ($page > 1): ?>
-                            <a href="user_transaction.php?page=<?php echo $page - 1; ?>" class="page-link">Previous</a>
+                            <a href="user_transaction.php?page=<?php echo $page - 1; ?><?php echo htmlspecialchars($pagination_query_str); ?>" class="page-link">Previous</a>
                         <?php endif; ?>
 
                         <?php if ($page < $total_pages): ?>
-                            <a href="user_transaction.php?page=<?php echo $page + 1; ?>" class="page-link">Next</a>
+                            <a href="user_transaction.php?page=<?php echo $page + 1; ?><?php echo htmlspecialchars($pagination_query_str); ?>" class="page-link">Next</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -176,7 +220,7 @@
                 </div>
 
                 <div class="form-group has-select">
-                    <input type="text" id="edit_transaction_date" name="transaction_date" readonly style="background: #f1f5f9; color: #94a3b8; cursor: not-allowed;">
+                    <input type="text" id="edit_transaction_date" name="transaction_date" required>
                     <label for="edit_transaction_date">Date</label>
                 </div>
 

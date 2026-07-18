@@ -231,22 +231,96 @@ body.landing-body::before {
     line-height: 1.6;
 }
 
-/* reponsive */
-@media (max-width: 992px) {
+/* ========================================================== */
+/* RESPONSIVE LAYOUT SYSTEM OVERRIDES                         */
+/* Support mobile (<576px), tablet (576px - 991px), and desktop (>=992px) */
+/* ========================================================== */
+
+/* Hero graphic responsive svg */
+.hero-graphic svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Tablet screens (576px to 991px) */
+@media (max-width: 991px) {
+    .navbar {
+        padding: 20px 5%;
+    }
     .hero {
         flex-direction: column;
         text-align: center;
         padding: 60px 5%;
+        gap: 32px;
     }
     .hero-content {
         max-width: 100%;
+    }
+    .hero-content h1 {
+        font-size: 42px;
+        margin-bottom: 16px;
+    }
+    .hero-content p {
+        font-size: 16px;
+        margin-bottom: 28px;
     }
     .cta-group {
         justify-content: center;
     }
     .features-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         padding: 60px 5%;
         gap: 24px;
+    }
+    .feature-card {
+        padding: 30px;
+    }
+}
+
+/* Mobile screens (below 576px) */
+@media (max-width: 575px) {
+    .navbar {
+        padding: 16px 4%;
+    }
+    .nav-links {
+        gap: 16px;
+    }
+    .nav-links a {
+        font-size: 13.5px;
+    }
+    .nav-links .btn-login {
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+    .hero {
+        padding: 40px 4%;
+    }
+    .hero-content h1 {
+        font-size: 32px;
+        letter-spacing: -0.5px;
+    }
+    .cta-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+        gap: 12px;
+    }
+    .btn-primary, .btn-secondary {
+        padding: 12px 24px;
+        text-align: center;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+        padding: 40px 4%;
+        gap: 16px;
+    }
+    .feature-card {
+        padding: 24px;
     }
 }

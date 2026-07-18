@@ -11,9 +11,6 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
-// --- FETCH DASHBOARD STATS ---
-
-// 1. Total Registered Users (role = 'user')
 $total_users = 0;
 $res = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'user'");
 if ($res && $row = $res->fetch_assoc()) {

@@ -270,7 +270,7 @@
                 <form id="editMonthsForm">
                     <input type="hidden" name="action" value="edit_months">
                     <div class="form-group" style="margin-top: 12px;">
-                        <input type="number" id="edit_period_months" name="repayment_period_months" step="12" value="<?php echo $loan_profile['repayment_period_months']; ?>" onkeydown="return false;" required>
+                        <input type="number" id="edit_period_months" name="repayment_period_months" style="caret-color: transparent;" step="12" value="<?php echo $loan_profile['repayment_period_months']; ?>" onkeydown="return false;" required>
                         <label for="edit_period_months">New Repayment Period (Months)</label>
                     </div>
                     <button type="submit" class="btn-submit" id="saveMonthsBtn">Save Changes</button>

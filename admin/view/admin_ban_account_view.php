@@ -6,7 +6,7 @@
     <title>Ban Account - MoneyKu Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/admin_sidebar.css">
-    <link rel="stylesheet" href="../css/ban_account.css">
+    <link rel="stylesheet" href="../css/admin_ban_account.css">
 </head>
 <body>
 
@@ -108,7 +108,7 @@
             const formData = new FormData(this);
             formData.append('action', 'ban_user');
 
-            fetch('ban_account.php', {
+            fetch('admin_ban_account.php', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -145,7 +145,7 @@
             formData.append('action', 'activate_user');
             formData.append('user_id', userId);
 
-            fetch('ban_account.php', {
+            fetch('admin_ban_account.php', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }

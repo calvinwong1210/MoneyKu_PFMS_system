@@ -30,8 +30,8 @@
     <main class="main-content">
         <header class="main-header">
             <div class="welcome-text">
-                <h1>Overview Dashboard</h1>
-                <p>Welcome back, <?php echo htmlspecialchars($username); ?>. Here is the active system overview.</p>
+                <h1>Admin Dashboard</h1>
+                <p>Welcome back, <?php echo htmlspecialchars($username); ?>.</p>
             </div>
             <div class="date-badge">
                 📅 System Date: <?php echo date('Y-m-d'); ?>

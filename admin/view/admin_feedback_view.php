@@ -78,8 +78,8 @@
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="btn-action-view" onclick="viewFeedback(<?php echo htmlspecialchars(json_encode($f)); ?>)" title="View Full Details">👁️ View</button>
-                                            <button class="btn-action-delete" onclick="confirmDeleteFeedback(<?php echo $f['feedback_id']; ?>)" title="Delete Feedback">🗑️ Delete</button>
+                                            <button class="btn-action-view" onclick="viewFeedback(<?php echo htmlspecialchars(json_encode($f)); ?>)" title="View Full Details">View</button>
+                                            <button class="btn-action-delete" onclick="confirmDeleteFeedback(<?php echo $f['feedback_id']; ?>)" title="Delete Feedback">Delete</button>
                                         </div>
                                     </td>
                                 </tr>

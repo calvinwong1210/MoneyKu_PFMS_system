@@ -299,3 +299,14 @@ h2 {
     background-color: #6c757d; 
     cursor: not-allowed; 
 }
+
+@media (max-width: 575px) {
+    .toast {
+        left: 20px;
+        right: 20px;
+        transform: translateY(-150%);
+    }
+    .toast.show {
+        transform: translateY(0);
+    }
+}

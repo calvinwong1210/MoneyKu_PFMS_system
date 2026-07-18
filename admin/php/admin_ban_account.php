@@ -139,5 +139,5 @@ if ($res) {
 
 $conn->close();
 
-include '../view/ban_account_view.php';
+include '../view/admin_ban_account_view.php';
 ?>

@@ -40,19 +40,27 @@ if ($start_month >= $current_month && $loan['initial_override_locked'] == 0) {
 // Calculate unpaid months and past unpaid status for page rendering
 $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
 $current_ts = strtotime(date('Y-m-01'));
+$unpaid_months_info = [];
 $unpaid_months_list = [];
 $temp_ts = $start_ts;
 
 while ($temp_ts <= $current_ts) {
     $month_str = date('Y-m', $temp_ts);
     
-    $chk_stmt = $conn->prepare("SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
+    $chk_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
     $chk_stmt->bind_param("iss", $loan_id, $month_str, $month_str);
     $chk_stmt->execute();
-    $has_record = ($chk_stmt->get_result()->num_rows > 0);
+    $res = $chk_stmt->get_result()->fetch_assoc();
+    $total_paid = $res['total_paid'] ? (float)$res['total_paid'] : 0.0;
     $chk_stmt->close();
     
-    if (!$has_record) {
+    $monthly_payment = (float)$loan['monthly_payment'];
+    if ($total_paid < $monthly_payment) {
+        $outstanding = $monthly_payment - $total_paid;
+        $unpaid_months_info[] = [
+            'month' => $month_str,
+            'outstanding' => $outstanding
+        ];
         $unpaid_months_list[] = $month_str;
     }
     
@@ -67,12 +75,7 @@ foreach ($unpaid_months_list as $m) {
 }
 
 // Check monthly execution metrics state
-$month_check_sql = "SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))";
-$m_stmt = $conn->prepare($month_check_sql);
-$m_stmt->bind_param("iss", $loan_id, $current_month, $current_month);
-$m_stmt->execute();
-$already_paid_this_month = ($m_stmt->get_result()->num_rows > 0);
-$m_stmt->close();
+$already_paid_this_month = !in_array($current_month, $unpaid_months_list);
 
 // --- AJAX Repayment Operation Engine ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" 
@@ -127,7 +130,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $this_month_amount = filter_var($_POST['this_month_amount'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
 
             if ($prior_amount <= 0 && $this_month_paid === 0) {
-                throw new Exception("Please specify cumulative payments or a current month payment.");
+                $up_loan_sql = "UPDATE student_loans SET initial_override_locked = 1 WHERE loan_id = ?";
+                $up_stmt = $conn->prepare($up_loan_sql);
+                $up_stmt->bind_param("i", $loan_id);
+                if (!$up_stmt->execute()) {
+                    throw new Exception("Failed to save prior repayment settings.");
+                }
+                $up_stmt->close();
+                $conn->commit();
+                echo json_encode(["status" => "success", "message" => "Prior repayment settings saved."]);
+                $conn->close();
+                exit;
             }
 
             $current_balance = (float)$loan['remaining_balance'];
@@ -259,26 +272,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
             $current_ts = strtotime(date('Y-m-01'));
             
-            $unpaid_months = [];
+            $unpaid_months_info = [];
             $temp_ts = $start_ts;
             
             while ($temp_ts <= $current_ts) {
                 $month_str = date('Y-m', $temp_ts);
                 
-                $chk_stmt = $conn->prepare("SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
+                $chk_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
                 $chk_stmt->bind_param("iss", $loan_id, $month_str, $month_str);
                 $chk_stmt->execute();
-                $has_record = ($chk_stmt->get_result()->num_rows > 0);
+                $res = $chk_stmt->get_result()->fetch_assoc();
+                $total_paid = $res['total_paid'] ? (float)$res['total_paid'] : 0.0;
                 $chk_stmt->close();
                 
-                if (!$has_record) {
-                    $unpaid_months[] = $month_str;
+                $monthly_payment = (float)$loan['monthly_payment'];
+                if ($total_paid < $monthly_payment) {
+                    $outstanding = $monthly_payment - $total_paid;
+                    $unpaid_months_info[] = [
+                        'month' => $month_str,
+                        'outstanding' => $outstanding
+                    ];
                 }
                 
                 $temp_ts = strtotime("+1 month", $temp_ts);
             }
 
-            if (empty($unpaid_months)) {
+            if (empty($unpaid_months_info)) {
                 throw new Exception("Repayment for this month is already completed.");
             }
 
@@ -288,18 +307,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $inserted_records = 0;
             $months_paid_names = [];
 
-            $total_unpaid = count($unpaid_months);
+            $total_unpaid = count($unpaid_months_info);
             for ($i = 0; $i < $total_unpaid; $i++) {
                 if ($allocated_amount <= 0) {
                     break;
                 }
                 
-                $unpaid_m = $unpaid_months[$i];
-                $pay_for_this_month = min($allocated_amount, $monthly_payment);
+                $info = $unpaid_months_info[$i];
+                $unpaid_m = $info['month'];
+                $outstanding = $info['outstanding'];
+                
+                // Pay up to the outstanding amount for this month
+                $pay_for_this_month = min($allocated_amount, $outstanding);
                 
                 // If it is the last unpaid month, consume all remaining allocated amount
                 if ($i === $total_unpaid - 1 && $allocated_amount > $pay_for_this_month) {
                     $pay_for_this_month = $allocated_amount;
+                }
+                
+                $pay_for_this_month = round($pay_for_this_month, 2);
+                if ($pay_for_this_month < 0.01) {
+                    continue;
                 }
                 
                 $allocated_amount -= $pay_for_this_month;

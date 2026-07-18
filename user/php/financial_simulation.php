@@ -153,19 +153,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         if (!$can_afford_now) {
             $risk_level = "critical";
             $color = "#dc2626";
-            $advice = "You do not have enough cash reserves to purchase this item immediately. We strongly recommend saving up first.";
+            $advice = "You don't have enough savings for this purchase.";
         } elseif ($depletion_ratio > 50) {
             $risk_level = "warning";
             $color = "#ea580c";
-            $advice = "Buying this immediately will deplete more than 50% of your total savings. This leaves you vulnerable to emergency expenses.";
+            $advice = "This purchase will use over 50% of your savings.";
         } elseif ($depletion_ratio > 20) {
             $risk_level = "caution";
             $color = "#eab308";
-            $advice = "This purchase is affordable, but it consumes a noticeable portion (" . round($depletion_ratio, 1) . "%) of your cash reserves. Think carefully before spending.";
+            $advice = "This purchase will use (" . round($depletion_ratio, 1) . "%) of your current savings.";
         } else {
             $risk_level = "safe";
             $color = "#10b981";
-            $advice = "This purchase is fully safe. It consumes only " . round($depletion_ratio, 1) . "% of your total balance and won't affect your emergency buffer.";
+            $advice = "This purchase is within your budget. It consumes only " . round($depletion_ratio, 1) . "%";
         }
         
         // Saving & Recovery timeline
@@ -287,7 +287,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         $sim_expense = filter_var($_POST['sim_expense'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
         $sim_budget_util = filter_var($_POST['sim_budget_util'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
         $sim_ptptn_status = $_POST['sim_ptptn_status'] ?? 'paid';
-        $sim_goal_progress = filter_var($_POST['sim_goal_progress'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00;
+        $sim_goal_progress = (filter_var($_POST['sim_goal_progress'] ?? 0, FILTER_VALIDATE_FLOAT) ?: 0.00) / 100.0;
         
         if ($sim_income < 0 || $sim_expense < 0) {
             echo json_encode(["status" => "error", "message" => "Simulated values must be non-negative."]);
@@ -337,20 +337,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         
         $grade = "Poor";
         $color = "#f43f5e";
-        $advice = "Your simulated health score needs work. Keep expenses low and clear PTPTN arrears to boost your score.";
+        $advice = "Poor simulated score. Reduce your spending and improve your budget.";
         
         if ($total_score >= 80) {
             $grade = "Excellent";
             $color = "#10b981";
-            $advice = "Excellent simulated health score! Keep up this high-performance financial strategy!";
+            $advice = "Excellent simulated score! Keep it up!";
         } elseif ($total_score >= 60) {
             $grade = "Good";
             $color = "#3b82f6";
-            $advice = "Good simulated score. This demonstrates stable and sustainable cashflow management.";
+            $advice = "Good simulated score. Stay on track!";
         } elseif ($total_score >= 40) {
             $grade = "Fair";
             $color = "#eab308";
-            $advice = "Fair simulated score. Try decreasing category expenditures to build a stronger safety net.";
+            $advice = "Fair simulated score. Review your budget and spending.";
         }
         
         echo json_encode([

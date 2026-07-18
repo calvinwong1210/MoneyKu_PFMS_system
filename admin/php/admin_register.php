@@ -74,5 +74,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     exit;
 }
 
-include '../view/register_admin_view.php';
+include '../view/admin_register_view.php';
 ?>

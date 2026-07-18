@@ -33,12 +33,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
         }
 
         // Prevent setting date into past calendar months
-        $tx_month = date('Y-m', strtotime($date));
-        $current_month = date('Y-m');
-        if ($tx_month < $current_month) {
-            echo json_encode(["status" => "error", "message" => "Cannot add transactions in past calendar months!"]);
-            exit;
-        }
+        // $tx_month = date('Y-m', strtotime($date));
+        // $current_month = date('Y-m');
+        // if ($tx_month < $current_month) {
+        //     echo json_encode(["status" => "error", "message" => "Cannot add transactions in past calendar months!"]);
+        //     exit;
+        // }
 
         $insert_sql = "INSERT INTO user_transactions (user_id, transaction_type, category, amount, description, transaction_date) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_sql);
@@ -190,10 +190,62 @@ if ($page < 1) {
 }
 $offset = ($page - 1) * $limit;
 
+// Get filter parameters
+$filter_year = isset($_GET['filter_year']) && $_GET['filter_year'] !== '' ? intval($_GET['filter_year']) : null;
+$filter_month = isset($_GET['filter_month']) && $_GET['filter_month'] !== '' ? intval($_GET['filter_month']) : null;
+$filter_category = isset($_GET['filter_category']) && $_GET['filter_category'] !== '' ? trim($_GET['filter_category']) : null;
+
+// Fetch distinct years dynamically for filter options
+$years_sql = "SELECT DISTINCT YEAR(transaction_date) AS tx_year FROM user_transactions WHERE user_id = ? ORDER BY tx_year DESC";
+$years_stmt = $conn->prepare($years_sql);
+$years_stmt->bind_param("i", $user_id);
+$years_stmt->execute();
+$years_result = $years_stmt->get_result();
+$available_years = [];
+while ($row = $years_result->fetch_assoc()) {
+    if ($row['tx_year']) {
+        $available_years[] = intval($row['tx_year']);
+    }
+}
+$years_stmt->close();
+
+// Fetch distinct categories dynamically for filter options
+$categories_sql = "SELECT DISTINCT category FROM user_transactions WHERE user_id = ? ORDER BY category ASC";
+$categories_stmt = $conn->prepare($categories_sql);
+$categories_stmt->bind_param("i", $user_id);
+$categories_stmt->execute();
+$categories_result = $categories_stmt->get_result();
+$available_categories = [];
+while ($row = $categories_result->fetch_assoc()) {
+    if ($row['category']) {
+        $available_categories[] = $row['category'];
+    }
+}
+$categories_stmt->close();
+
 // 4.1 Count total rows to compute total pages
 $count_sql = "SELECT COUNT(*) FROM user_transactions WHERE user_id = ?";
+$count_params = [$user_id];
+$count_types = "i";
+
+if ($filter_year !== null) {
+    $count_sql .= " AND YEAR(transaction_date) = ?";
+    $count_params[] = $filter_year;
+    $count_types .= "i";
+}
+if ($filter_month !== null) {
+    $count_sql .= " AND MONTH(transaction_date) = ?";
+    $count_params[] = $filter_month;
+    $count_types .= "i";
+}
+if ($filter_category !== null) {
+    $count_sql .= " AND category = ?";
+    $count_params[] = $filter_category;
+    $count_types .= "s";
+}
+
 $count_stmt = $conn->prepare($count_sql);
-$count_stmt->bind_param("i", $user_id);
+$count_stmt->bind_param($count_types, ...$count_params);
 $count_stmt->execute();
 $count_stmt->bind_result($total_rows);
 $count_stmt->fetch();
@@ -202,9 +254,33 @@ $count_stmt->close();
 $total_pages = ceil($total_rows / $limit);
 
 // 4.2 Fetch limited rows
-$tx_sql = "SELECT transaction_id, transaction_type, category, amount, description, transaction_date FROM user_transactions WHERE user_id = ? ORDER BY transaction_date DESC, transaction_id DESC LIMIT ? OFFSET ?";
+$tx_sql = "SELECT transaction_id, transaction_type, category, amount, description, transaction_date FROM user_transactions WHERE user_id = ?";
+$tx_params = [$user_id];
+$tx_types = "i";
+
+if ($filter_year !== null) {
+    $tx_sql .= " AND YEAR(transaction_date) = ?";
+    $tx_params[] = $filter_year;
+    $tx_types .= "i";
+}
+if ($filter_month !== null) {
+    $tx_sql .= " AND MONTH(transaction_date) = ?";
+    $tx_params[] = $filter_month;
+    $tx_types .= "i";
+}
+if ($filter_category !== null) {
+    $tx_sql .= " AND category = ?";
+    $tx_params[] = $filter_category;
+    $tx_types .= "s";
+}
+
+$tx_sql .= " ORDER BY transaction_date DESC, transaction_id DESC LIMIT ? OFFSET ?";
+$tx_params[] = $limit;
+$tx_params[] = $offset;
+$tx_types .= "ii";
+
 $stmt = $conn->prepare($tx_sql);
-$stmt->bind_param("iii", $user_id, $limit, $offset);
+$stmt->bind_param($tx_types, ...$tx_params);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -214,6 +290,12 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 $conn->close();
+
+// Prepare clean query parameters for pagination URLs
+$url_params = $_GET;
+unset($url_params['page']);
+$pagination_query = http_build_query($url_params);
+$pagination_query_str = $pagination_query ? '&' . $pagination_query : '';
 
 // 5. Inject decoupled View
 include '../view/user_transaction_view.php';
