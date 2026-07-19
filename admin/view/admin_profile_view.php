@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="../css/admin_sidebar.css">
     <link rel="stylesheet" href="../css/admin_profile.css">
 </head>
-<body>
+<body class="dashboard-body">
+
+    <div id="toast" class="toast"></div>
 
     <!-- Admin Sidebar navigation -->
     <?php require_once '../admin_sidebar.php'; ?>
@@ -29,54 +31,54 @@
             </div>
 
             <form id="profileForm" enctype="multipart/form-data">
-                <!-- Avatar Upload Section -->
-                <div class="avatar-upload-container">
-                    <div class="avatar-preview-wrapper">
-                        <div class="avatar-circle">
-                            <?php if (!empty($profile['profile_picture']) && file_exists('../uploads/avatars/' . $profile['profile_picture'])): ?>
-                                <img src="../uploads/avatars/<?php echo htmlspecialchars($profile['profile_picture']); ?>" id="avatarPreview" alt="Avatar">
-                            <?php else: ?>
-                                <div id="avatarPlaceholder"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
-                            <?php endif; ?>
-                        </div>
-                        <label for="profile_picture_input" class="avatar-edit-badge" title="Change Avatar">
-                            <span class="camera-icon">📷</span>
+                <!-- Profile Picture Section -->
+                <div class="profile-avatar-section">
+                    <div class="avatar-container">
+                        <?php if (!empty($profile['profile_picture']) && file_exists('../uploads/avatars/' . $profile['profile_picture'])): ?>
+                            <img id="avatarPreview" src="../uploads/avatars/<?php echo htmlspecialchars($profile['profile_picture']); ?>" alt="Avatar" class="profile-avatar-img">
+                        <?php else: ?>
+                            <div id="avatarPlaceholder" class="profile-avatar-placeholder"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
+                        <?php endif; ?>
+                        
+                        <!-- Circular camera badge trigger -->
+                        <label for="profile_picture_input" class="avatar-edit-badge" title="Upload Profile Picture">
+                            <svg class="camera-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
                         </label>
-                        <input type="file" id="profile_picture_input" name="profile_picture" accept="image/*" style="display: none;">
                     </div>
-                    <div class="avatar-upload-info">
-                        <h3>Your Avatar Image</h3>
-                        <p>Allowed formats: JPG, PNG, GIF, WEBP. Under 5MB.</p>
-                    </div>
+                    <input type="file" id="profile_picture_input" name="profile_picture" accept="image/*" style="display: none;">
+                    <p class="avatar-tip">Click the camera badge to choose a file</p>
                 </div>
 
                 <div class="form-grid">
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label>Username</label>
-                        <input type="text" value="<?php echo htmlspecialchars($username); ?>" disabled class="input-disabled">
+                        <input type="text" value="<?php echo htmlspecialchars($username); ?>" disabled style="background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; border-color: var(--borders);">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label>Email Address</label>
-                        <input type="text" value="<?php echo htmlspecialchars($profile['email']); ?>" disabled class="input-disabled">
+                        <input type="email" value="<?php echo htmlspecialchars($profile['email']); ?>" disabled style="background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; border-color: var(--borders);">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label for="full_name">Full Name *</label>
-                        <input type="text" id="full_name" name="full_name" required value="<?php echo htmlspecialchars($profile['full_name']); ?>" placeholder="Enter your full name">
+                        <input type="text" id="full_name" name="full_name" required value="<?php echo htmlspecialchars($profile['full_name']); ?>" placeholder="e.g. John Doe">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label for="occupation">Occupation</label>
-                        <input type="text" id="occupation" name="occupation" value="<?php echo htmlspecialchars($profile['occupation']); ?>" placeholder="Enter occupation">
+                        <input type="text" id="occupation" name="occupation" value="<?php echo htmlspecialchars($profile['occupation']); ?>" placeholder="e.g. Software Engineer">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label for="date_of_birth">Date of Birth</label>
                         <input type="date" id="date_of_birth" name="date_of_birth" value="<?php echo htmlspecialchars($profile['date_of_birth']); ?>">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-p">
                         <label for="gender">Gender</label>
                         <select id="gender" name="gender">
                             <option value="">Select Gender</option>
@@ -102,7 +104,7 @@
             
             <form id="passwordForm">
                 <div class="form-grid">
-                    <div class="form-group password-wrapper">
+                    <div class="form-group-p password-wrapper-p">
                         <label for="current_password">Current Password *</label>
                         <div class="input-with-eye">
                             <input type="password" id="current_password" name="current_password" required placeholder="Enter current password">
@@ -112,7 +114,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-group password-wrapper">
+                    <div class="form-group-p password-wrapper-p">
                         <label for="new_password">New Password *</label>
                         <div class="input-with-eye">
                             <input type="password" id="new_password" name="new_password" required placeholder="At least 6 characters">
@@ -122,7 +124,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-group password-wrapper">
+                    <div class="form-group-p password-wrapper-p">
                         <label for="confirm_password">Confirm New Password *</label>
                         <div class="input-with-eye">
                             <input type="password" id="confirm_password" name="confirm_password" required placeholder="Re-enter new password">
@@ -139,9 +141,6 @@
             </form>
         </section>
     </main>
-
-    <!-- Toast alert message container -->
-    <div id="toast" class="toast"></div>
 
     <script>
         function showToast(message, type = 'success') {
@@ -182,8 +181,15 @@
                     if (!previewImg) {
                         previewImg = document.createElement('img');
                         previewImg.id = 'avatarPreview';
+                        previewImg.className = 'profile-avatar-img';
                         previewImg.alt = 'Avatar';
-                        placeholder.parentNode.replaceChild(previewImg, placeholder);
+                        
+                        if (placeholder) {
+                            placeholder.parentNode.insertBefore(previewImg, placeholder);
+                            placeholder.remove();
+                        } else {
+                            document.querySelector('.avatar-container').prepend(previewImg);
+                        }
                     }
                     previewImg.src = event.target.result;
                 };
@@ -196,7 +202,7 @@
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
             btn.disabled = true;
-            btn.textContent = 'Saving Changes...';
+            btn.textContent = 'Saving...';
 
             const formData = new FormData(this);
 
@@ -243,7 +249,7 @@
             }
 
             btn.disabled = true;
-            btn.textContent = 'Updating Password...';
+            btn.textContent = 'Updating...';
 
             const formData = new FormData(this);
             formData.append('action', 'change_password');
@@ -258,7 +264,6 @@
                 if (data.status === 'success') {
                     showToast(data.message, 'success');
                     document.getElementById('passwordForm').reset();
-                    // Reset all eye toggles to password type
                     ['current_password', 'new_password', 'confirm_password'].forEach(id => {
                         const input = document.getElementById(id);
                         input.type = 'password';

@@ -256,7 +256,7 @@
             <div id="health-tab" class="tab-panel">
                 <div class="simulation-grid">
                     <section class="simulation-card input-section">
-                        <h2>Financial Health Modeler</h2>
+                        <h2>Financial Health Simulator</h2>
                         <p class="subtitle">Adjust your monthly parameters below to see how changes dynamically improve or lower your overall 100-point Health Score.</p>
                         
                         <form id="healthSimForm" style="margin-top: 16px;">
