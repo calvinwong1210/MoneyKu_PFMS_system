@@ -24,17 +24,17 @@
         <!-- Ban User Form Card -->
         <section class="ban-form-container">
             <div class="card-header">
-                <h2>Suspend User Account</h2>
+                <h2>Suspend <?php echo $isAdminBanningAllowed ? 'User/Admin' : 'User'; ?> Account</h2>
                 <p>Enter the email address of the account you wish to deactivate. They will be notified via email.</p>
             </div>
 
             <form id="banForm">
                 <div class="form-group-row">
                     <div class="form-group">
-                        <label for="ban_email">User Email Address *</label>
-                        <input type="email" id="ban_email" name="email" required placeholder="user@example.com" autocomplete="off">
+                        <label for="ban_email"><?php echo $isAdminBanningAllowed ? 'User/Admin' : 'User'; ?> Email Address *</label>
+                        <input type="email" id="ban_email" name="email" required placeholder="email@example.com" autocomplete="off">
                     </div>
-                    <button type="submit" class="btn-ban-submit" id="banBtn">Ban User</button>
+                    <button type="submit" class="btn-ban-submit" id="banBtn">Ban <?php echo $isAdminBanningAllowed ? 'Account' : 'User'; ?></button>
                 </div>
             </form>
         </section>
@@ -42,7 +42,7 @@
         <!-- Suspended Users List Card -->
         <section class="ban-form-container" style="margin-top: 32px;">
             <div class="card-header-actions">
-                <h2>Suspended User Database</h2>
+                <h2>Suspended <?php echo $isAdminBanningAllowed ? 'Account' : 'User'; ?> Database</h2>
                 <span class="count-badge"><?php echo count($suspended_users); ?> accounts</span>
             </div>
 
@@ -52,6 +52,9 @@
                         <tr>
                             <th>Username</th>
                             <th>Email Address</th>
+                            <?php if ($isAdminBanningAllowed): ?>
+                                <th>Role</th>
+                            <?php endif; ?>
                             <th>Suspension Date</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
@@ -59,7 +62,7 @@
                     <tbody id="suspendedTableBody">
                         <?php if (empty($suspended_users)): ?>
                             <tr id="emptyRow">
-                                <td colspan="4" class="empty-state">No suspended accounts found in the database.</td>
+                                <td colspan="<?php echo $isAdminBanningAllowed ? 5 : 4; ?>" class="empty-state">No suspended accounts found in the database.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($suspended_users as $su): ?>
@@ -70,6 +73,11 @@
                                     <td>
                                         <span class="email-text"><?php echo htmlspecialchars($su['email']); ?></span>
                                     </td>
+                                    <?php if ($isAdminBanningAllowed): ?>
+                                        <td>
+                                            <span class="role-badge <?php echo strtolower($su['role']); ?>"><?php echo ucfirst($su['role']); ?></span>
+                                        </td>
+                                    <?php endif; ?>
                                     <td>
                                         <span class="date-text"><?php echo date('Y-m-d H:i', strtotime($su['updated_at'])); ?></span>
                                     </td>
@@ -126,12 +134,12 @@
                     showToast(data.message, 'error');
                 }
                 btn.disabled = false;
-                btn.textContent = 'Ban User';
+                btn.textContent = '<?php echo $isAdminBanningAllowed ? "Ban Account" : "Ban User"; ?>';
             })
             .catch(() => {
                 showToast('Network error, please try again.', 'error');
                 btn.disabled = false;
-                btn.textContent = 'Ban User';
+                btn.textContent = '<?php echo $isAdminBanningAllowed ? "Ban Account" : "Ban User"; ?>';
             });
         });
 
@@ -161,7 +169,8 @@
                     // Check if table is empty now
                     const tbody = document.getElementById('suspendedTableBody');
                     if (tbody.querySelectorAll('tr').length === 0) {
-                        tbody.innerHTML = `<tr id="emptyRow"><td colspan="4" class="empty-state">No suspended accounts found in the database.</td></tr>`;
+                        const colSpan = <?php echo $isAdminBanningAllowed ? 5 : 4; ?>;
+                        tbody.innerHTML = `<tr id="emptyRow"><td colspan="${colSpan}" class="empty-state">No suspended accounts found in the database.</td></tr>`;
                     }
                 } else {
                     showToast(data.message, 'error');

@@ -70,8 +70,8 @@
                     $groups = [
                         ['label' => 'Under 18', 'value' => $age_under_18],
                         ['label' => '18 - 24', 'value' => $age_18_24],
-                        ['label' => '25 - 34', 'value' => $age_25_34],
-                        ['label' => '35 and Above', 'value' => $age_35_above],
+                        ['label' => '25 - 30', 'value' => $age_25_30],
+                        ['label' => '31 and Above', 'value' => $age_31_above],
                         ['label' => 'Not Provided', 'value' => $age_unknown],
                     ];
                     

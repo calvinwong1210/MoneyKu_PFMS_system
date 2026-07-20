@@ -19,29 +19,48 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
+// Fetch current admin's email to verify if they have the specific privilege to ban admins
+$admin_email = '';
+$email_stmt = $conn->prepare("SELECT email FROM users WHERE user_id = ?");
+$email_stmt->bind_param("i", $user_id);
+$email_stmt->execute();
+$email_res = $email_stmt->get_result();
+if ($row = $email_res->fetch_assoc()) {
+    $admin_email = $row['email'];
+}
+$email_stmt->close();
+
+$isAdminBanningAllowed = ($admin_email === 'moneyku6666@gmail.com');
+
 // --- AJAX POST PROCESSOR ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     header('Content-Type: application/json');
 
     $action = $_POST['action'] ?? '';
 
-    // Action 1: Ban User Account
+    // Action 1: Ban User/Admin Account
     if ($action === 'ban_user') {
         $email = trim($_POST['email'] ?? '');
 
         if (empty($email)) {
-            echo json_encode(["status" => "error", "message" => "Please enter the user's registered email address."]);
+            echo json_encode(["status" => "error", "message" => "Please enter the registered email address."]);
             exit;
         }
 
-        // Check if user exists
-        $stmt = $conn->prepare("SELECT user_id, username, account_status FROM users WHERE email = ? AND role = 'user'");
-        $stmt->bind_param("s", $email);
+        if ($isAdminBanningAllowed) {
+            // ban both 'user' and 'admin' 
+            $stmt = $conn->prepare("SELECT user_id, username, account_status FROM users WHERE email = ? AND user_id != ?");
+            $stmt->bind_param("si", $email, $user_id);
+        } else {
+            // only ban 'user'
+            $stmt = $conn->prepare("SELECT user_id, username, account_status FROM users WHERE email = ? AND role = 'user'");
+            $stmt->bind_param("s", $email);
+        }
         $stmt->execute();
         $res = $stmt->get_result();
 
         if ($res->num_rows !== 1) {
-            echo json_encode(["status" => "error", "message" => "No registered user found with this email address."]);
+            echo json_encode(["status" => "error", "message" => "No registered account found with this email address."]);
             $stmt->close();
             exit;
         }
@@ -92,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
                                . "MoneyKu Admin Team";
 
                 $mail->send();
-                echo json_encode(["status" => "success", "message" => "User account banned and notification email sent!"]);
+                echo json_encode(["status" => "success", "message" => "Account suspended and notification email sent!"]);
             } catch (Exception $e) {
                 // Return success anyway since the DB update was completed, but notify about the email error
                 echo json_encode(["status" => "success", "message" => "Account deactivated, but notification email failed to send: " . $mail->ErrorInfo]);
@@ -105,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
         exit;
     }
 
-    // Action 2: Activate/Restore User Account
+    // Action 2: Activate/Restore User/Admin Account
     if ($action === 'activate_user') {
         $target_user_id = filter_var($_POST['user_id'] ?? 0, FILTER_VALIDATE_INT);
 
@@ -114,11 +133,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
             exit;
         }
 
-        $upd = $conn->prepare("UPDATE users SET account_status = 'active' WHERE user_id = ? AND role = 'user'");
+        if ($isAdminBanningAllowed) {
+            $upd = $conn->prepare("UPDATE users SET account_status = 'active' WHERE user_id = ?");
+        } else {
+            $upd = $conn->prepare("UPDATE users SET account_status = 'active' WHERE user_id = ? AND role = 'user'");
+        }
         $upd->bind_param("i", $target_user_id);
 
         if ($upd->execute()) {
-            echo json_encode(["status" => "success", "message" => "User account reactivated successfully!"]);
+            echo json_encode(["status" => "success", "message" => "Account reactivated successfully!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Failed to reactivate account. Server error."]);
         }
@@ -128,9 +151,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SERVER['HTTP_X_REQUESTED_WIT
     }
 }
 
-// --- FETCH SUSPENDED USER ACCOUNTS ---
+// --- FETCH SUSPENDED ACCOUNTS ---
 $suspended_users = [];
-$res = $conn->query("SELECT user_id, username, email, updated_at FROM users WHERE role = 'user' AND account_status = 'inactive' ORDER BY updated_at DESC");
+if ($isAdminBanningAllowed) {
+    $res = $conn->query("SELECT user_id, username, email, role, updated_at FROM users WHERE account_status = 'inactive' ORDER BY updated_at DESC");
+} else {
+    $res = $conn->query("SELECT user_id, username, email, role, updated_at FROM users WHERE role = 'user' AND account_status = 'inactive' ORDER BY updated_at DESC");
+}
 if ($res) {
     while ($row = $res->fetch_assoc()) {
         $suspended_users[] = $row;

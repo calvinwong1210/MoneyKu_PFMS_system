@@ -20,16 +20,16 @@ if ($res && $row = $res->fetch_assoc()) {
 // 2. Age Distribution Breakdown
 $age_under_18 = 0;
 $age_18_24 = 0;
-$age_25_34 = 0;
-$age_35_above = 0;
+$age_25_30 = 0;
+$age_31_above = 0;
 $age_unknown = 0;
 
 // Query users age groups
 $age_query = "SELECT 
     SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 18 THEN 1 ELSE 0 END) AS under_18,
     SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 18 AND 24 THEN 1 ELSE 0 END) AS group_18_24,
-    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 25 AND 34 THEN 1 ELSE 0 END) AS group_25_34,
-    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= 35 THEN 1 ELSE 0 END) AS group_35_above
+    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 25 AND 30 THEN 1 ELSE 0 END) AS group_25_30,
+    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= 31 THEN 1 ELSE 0 END) AS group_31_above
 FROM user_profiles p
 INNER JOIN users u ON u.user_id = p.user_id
 WHERE u.role = 'user'";
@@ -38,8 +38,8 @@ $res = $conn->query($age_query);
 if ($res && $row = $res->fetch_assoc()) {
     $age_under_18 = (int)($row['under_18'] ?? 0);
     $age_18_24 = (int)($row['group_18_24'] ?? 0);
-    $age_25_34 = (int)($row['group_25_34'] ?? 0);
-    $age_35_above = (int)($row['group_35_above'] ?? 0);
+    $age_25_30 = (int)($row['group_25_30'] ?? 0);
+    $age_31_above = (int)($row['group_31_above'] ?? 0);
 }
 
 // Calculate unknown age users (users without a profile or date of birth set)
