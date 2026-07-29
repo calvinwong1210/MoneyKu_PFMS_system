@@ -25,6 +25,7 @@
             <!-- LEFT PANEL: Dynamic Target Setup Control Board -->
             <section class="form-card">
                 <h2>Create your saving goal</h2>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px; margin-bottom: 16px;">Available Total Balance: <strong style="color: <?php echo $wallet_balance > 0 ? '#10b981' : '#dc2626'; ?>;">RM <?php echo number_format(max(0, $wallet_balance), 2); ?></strong></p>
                 <form id="goalForm">
                     <input type="hidden" name="action" value="create">
 
@@ -39,7 +40,7 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="number" id="current_amount" name="current_amount" step="0.01" min="0" placeholder=" " required>
+                        <input type="number" id="current_amount" name="current_amount" step="0.01" min="0" max="<?php echo max(0, $wallet_balance); ?>" placeholder=" " required>
                         <label for="current_amount">Initial Funds Saved (RM)</label>
                     </div>
 
@@ -123,9 +124,18 @@
             }).then(res => res.json());
         }
 
+        const walletBalance = <?php echo json_encode(max(0, $wallet_balance)); ?>;
+
         // Create Operations
         document.getElementById('goalForm').addEventListener('submit', function (e) {
             e.preventDefault();
+
+            const currentAmount = parseFloat(document.getElementById('current_amount').value) || 0;
+            if (currentAmount > walletBalance) {
+                showToast(`Initial funds (RM ${currentAmount.toFixed(2)}) cannot exceed your available total balance (RM ${walletBalance.toFixed(2)}).`, 'error');
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = 'Launching...';
@@ -147,6 +157,14 @@
         function updateProgress(e, goalId) {
             e.preventDefault();
             const form = e.target;
+            const addedInput = form.querySelector('[name="added_amount"]');
+            const addedAmount = parseFloat(addedInput ? addedInput.value : 0) || 0;
+
+            if (addedAmount > walletBalance) {
+                showToast(`Added amount (RM ${addedAmount.toFixed(2)}) cannot exceed your available total balance (RM ${walletBalance.toFixed(2)}).`, 'error');
+                return;
+            }
+
             const formData = new FormData(form);
             formData.append('action', 'update_progress');
             formData.append('goal_id', goalId);

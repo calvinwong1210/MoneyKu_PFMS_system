@@ -9,6 +9,33 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../../config/db_config.php';
 $user_id = $_SESSION['user_id'];
 
+function get_wallet_balance($conn, $user_id) {
+    $total_income = 0.0;
+    $total_expense = 0.0;
+
+    $inc_sql = "SELECT SUM(amount) AS total FROM user_transactions WHERE user_id = ? AND transaction_type = 'income'";
+    $stmt = $conn->prepare($inc_sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $res = $stmt->get_result()->fetch_assoc();
+    if ($res && $res['total'] !== null) {
+        $total_income = (float)$res['total'];
+    }
+    $stmt->close();
+
+    $exp_sql = "SELECT SUM(amount) AS total FROM user_transactions WHERE user_id = ? AND transaction_type = 'expense'";
+    $stmt = $conn->prepare($exp_sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $res = $stmt->get_result()->fetch_assoc();
+    if ($res && $res['total'] !== null) {
+        $total_expense = (float)$res['total'];
+    }
+    $stmt->close();
+
+    return $total_income - $total_expense;
+}
+
 // --- AJAX Operation Engine Router ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" 
 && isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
@@ -32,6 +59,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
 
         if ($current_amount === false || $current_amount < 0) {
             $current_amount = 0.0;
+        }
+
+        // Validate initial savings against available total balance
+        $wallet_balance = get_wallet_balance($conn, $user_id);
+        if ($current_amount > $wallet_balance) {
+            $avail_formatted = number_format(max(0, $wallet_balance), 2);
+            $curr_formatted = number_format($current_amount, 2);
+            echo json_encode(["status" => "error", "message" => "Initial funds (RM {$curr_formatted}) cannot exceed your total balance (RM {$avail_formatted})."]);
+            exit;
         }
 
         $conn->begin_transaction();
@@ -72,6 +108,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
 
         if ($added_amount === false || $added_amount <= 0) {
             echo json_encode(["status" => "error", "message" => "Please supply a valid amount to save."]);
+            exit;
+        }
+
+        // Validate added amount against available total balance
+        $wallet_balance = get_wallet_balance($conn, $user_id);
+        if ($added_amount > $wallet_balance) {
+            $avail_formatted = number_format(max(0, $wallet_balance), 2);
+            $added_formatted = number_format($added_amount, 2);
+            echo json_encode(["status" => "error", "message" => "Added amount (RM {$added_formatted}) cannot exceed your total balance (RM {$avail_formatted})."]);
             exit;
         }
 
@@ -181,6 +226,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
 }
 
 // --- Data Fetch Extraction Phase ---
+$wallet_balance = get_wallet_balance($conn, $user_id);
+
 $goals_sql = "SELECT goal_id, goal_name, target_amount, current_amount, target_date FROM user_savings_goals WHERE user_id = ? ORDER BY target_date ASC, goal_id DESC";
 $stmt = $conn->prepare($goals_sql);
 $stmt->bind_param("i", $user_id);

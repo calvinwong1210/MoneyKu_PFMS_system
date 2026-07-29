@@ -16,7 +16,7 @@
     <main class="main-content">
         <header class="main-header">
             <div class="welcome-text">
-                <h1>Ban Account Settings</h1>
+                <h1>Ban Account Management</h1>
                 <p>Restrict spam accounts and de-authorize users violating MoneyKu terms of use.</p>
             </div>
         </header>

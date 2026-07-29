@@ -78,9 +78,16 @@
                                      <tr>
                                          <td class="tx-date">
                                              <?php echo date('M d, Y', strtotime($r['payment_date'])); ?>
-                                             <?php if (!empty($r['target_month'])): ?>
+                                             <?php 
+                                             $target_ts = !empty($r['target_month']) ? strtotime($r['target_month'] . '-01') : false;
+                                             if ($target_ts !== false): 
+                                             ?>
                                                  <span class="target-month-hint" style="font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;">
-                                                     For <?php echo date('M Y', strtotime($r['target_month'] . '-01')); ?>
+                                                     For <?php echo date('M Y', $target_ts); ?>
+                                                 </span>
+                                             <?php elseif ($r['target_month'] === 'prior_excess'): ?>
+                                                 <span class="target-month-hint" style="font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;">
+                                                     Prior Overpayment
                                                  </span>
                                              <?php else: ?>
                                                  <span class="target-month-hint" style="font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 500;">

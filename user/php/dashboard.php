@@ -260,20 +260,26 @@ if ($loan_db) {
         $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
         $current_ts = strtotime(date('Y-m-01'));
         
+        // Fetch total paid amount from all repayment_records to support overpayment coverage
+        $sum_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ?");
+        $sum_stmt->bind_param("i", $loan_id);
+        $sum_stmt->execute();
+        $sum_res = $sum_stmt->get_result()->fetch_assoc();
+        $total_paid_pool = $sum_res['total_paid'] ? (float)$sum_res['total_paid'] : 0.0;
+        $sum_stmt->close();
+
+        $monthly_payment = (float)$loan_db['monthly_payment'];
         $unpaid_months = [];
         $temp_ts = $start_ts;
         
         while ($temp_ts <= $current_ts) {
             $month_str = date('Y-m', $temp_ts);
             
-            $chk_stmt = $conn->prepare("SELECT repayment_id FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
-            $chk_stmt->bind_param("iss", $loan_id, $month_str, $month_str);
-            $chk_stmt->execute();
-            $has_record = ($chk_stmt->get_result()->num_rows > 0);
-            $chk_stmt->close();
-            
-            if (!$has_record) {
+            if ($total_paid_pool >= $monthly_payment) {
+                $total_paid_pool -= $monthly_payment;
+            } else {
                 $unpaid_months[] = $month_str;
+                $total_paid_pool = 0.0;
             }
             
             $temp_ts = strtotime("+1 month", $temp_ts);
@@ -306,7 +312,7 @@ if ($loan_db) {
                 $ptptn_sub_color = "#10b981";
                 $ptptn_score_text = "Paid (25/25)";
             } else {
-                if ($day_of_month >= 17 || $day_of_month <= 27) {
+                if ($day_of_month <= 27) {
                     $ptptn_points = 14;
                     $ptptn_icon = "🟡";
                     $ptptn_sub_color = "#eab308";

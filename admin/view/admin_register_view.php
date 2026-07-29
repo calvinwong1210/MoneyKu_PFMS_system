@@ -16,7 +16,7 @@
     <main class="main-content">
         <header class="main-header">
             <div class="welcome-text">
-                <h1>Administrative Credentials</h1>
+                <h1>Create Admin Account</h1>
                 <p>Configure and register a new administrator account with root dashboard access privileges.</p>
             </div>
         </header>

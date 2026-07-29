@@ -40,6 +40,15 @@ if ($start_month >= $current_month && $loan['initial_override_locked'] == 0) {
 // Calculate unpaid months and past unpaid status for page rendering
 $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
 $current_ts = strtotime(date('Y-m-01'));
+
+$sum_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ?");
+$sum_stmt->bind_param("i", $loan_id);
+$sum_stmt->execute();
+$sum_res = $sum_stmt->get_result()->fetch_assoc();
+$total_paid_pool = $sum_res['total_paid'] ? (float)$sum_res['total_paid'] : 0.0;
+$sum_stmt->close();
+
+$monthly_payment = (float)$loan['monthly_payment'];
 $unpaid_months_info = [];
 $unpaid_months_list = [];
 $temp_ts = $start_ts;
@@ -47,21 +56,16 @@ $temp_ts = $start_ts;
 while ($temp_ts <= $current_ts) {
     $month_str = date('Y-m', $temp_ts);
     
-    $chk_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
-    $chk_stmt->bind_param("iss", $loan_id, $month_str, $month_str);
-    $chk_stmt->execute();
-    $res = $chk_stmt->get_result()->fetch_assoc();
-    $total_paid = $res['total_paid'] ? (float)$res['total_paid'] : 0.0;
-    $chk_stmt->close();
-    
-    $monthly_payment = (float)$loan['monthly_payment'];
-    if ($total_paid < $monthly_payment) {
-        $outstanding = $monthly_payment - $total_paid;
+    if ($total_paid_pool >= $monthly_payment) {
+        $total_paid_pool -= $monthly_payment;
+    } else {
+        $outstanding = $monthly_payment - $total_paid_pool;
         $unpaid_months_info[] = [
             'month' => $month_str,
             'outstanding' => $outstanding
         ];
         $unpaid_months_list[] = $month_str;
+        $total_paid_pool = 0.0;
     }
     
     $temp_ts = strtotime("+1 month", $temp_ts);
@@ -272,33 +276,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $start_ts = strtotime(date('Y-m-01', strtotime($start_date)));
             $current_ts = strtotime(date('Y-m-01'));
             
+            $sum_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ?");
+            $sum_stmt->bind_param("i", $loan_id);
+            $sum_stmt->execute();
+            $sum_res = $sum_stmt->get_result()->fetch_assoc();
+            $total_paid_pool = $sum_res['total_paid'] ? (float)$sum_res['total_paid'] : 0.0;
+            $sum_stmt->close();
+
+            $monthly_payment = (float)$loan['monthly_payment'];
             $unpaid_months_info = [];
             $temp_ts = $start_ts;
             
             while ($temp_ts <= $current_ts) {
                 $month_str = date('Y-m', $temp_ts);
                 
-                $chk_stmt = $conn->prepare("SELECT SUM(payment_amount) AS total_paid FROM repayment_records WHERE loan_id = ? AND (target_month = ? OR (target_month IS NULL AND DATE_FORMAT(payment_date, '%Y-%m') = ?))");
-                $chk_stmt->bind_param("iss", $loan_id, $month_str, $month_str);
-                $chk_stmt->execute();
-                $res = $chk_stmt->get_result()->fetch_assoc();
-                $total_paid = $res['total_paid'] ? (float)$res['total_paid'] : 0.0;
-                $chk_stmt->close();
-                
-                $monthly_payment = (float)$loan['monthly_payment'];
-                if ($total_paid < $monthly_payment) {
-                    $outstanding = $monthly_payment - $total_paid;
+                if ($total_paid_pool >= $monthly_payment) {
+                    $total_paid_pool -= $monthly_payment;
+                } else {
+                    $outstanding = $monthly_payment - $total_paid_pool;
                     $unpaid_months_info[] = [
                         'month' => $month_str,
                         'outstanding' => $outstanding
                     ];
+                    $total_paid_pool = 0.0;
                 }
                 
                 $temp_ts = strtotime("+1 month", $temp_ts);
             }
 
             if (empty($unpaid_months_info)) {
-                throw new Exception("Repayment for this month is already completed.");
+                // If overpayments cover up to current month, target current month for additional overpayment
+                $unpaid_months_info[] = [
+                    'month' => date('Y-m'),
+                    'outstanding' => (float)$loan['monthly_payment']
+                ];
             }
 
             $monthly_payment = (float)$loan['monthly_payment'];
@@ -307,27 +318,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
             $inserted_records = 0;
             $months_paid_names = [];
 
-            $total_unpaid = count($unpaid_months_info);
-            for ($i = 0; $i < $total_unpaid; $i++) {
-                if ($allocated_amount <= 0) {
-                    break;
+            $info_index = 0;
+            $current_m_ts = !empty($unpaid_months_info) ? strtotime($unpaid_months_info[0]['month'] . '-01') : strtotime(date('Y-m-01'));
+
+            while ($allocated_amount > 0.009) {
+                if ($info_index < count($unpaid_months_info)) {
+                    $info = $unpaid_months_info[$info_index];
+                    $unpaid_m = $info['month'];
+                    $outstanding = $info['outstanding'];
+                    $info_index++;
+                } else {
+                    $unpaid_m = date('Y-m', $current_m_ts);
+                    $outstanding = $monthly_payment;
                 }
                 
-                $info = $unpaid_months_info[$i];
-                $unpaid_m = $info['month'];
-                $outstanding = $info['outstanding'];
-                
-                // Pay up to the outstanding amount for this month
                 $pay_for_this_month = min($allocated_amount, $outstanding);
-                
-                // If it is the last unpaid month, consume all remaining allocated amount
-                if ($i === $total_unpaid - 1 && $allocated_amount > $pay_for_this_month) {
-                    $pay_for_this_month = $allocated_amount;
-                }
-                
                 $pay_for_this_month = round($pay_for_this_month, 2);
+                
                 if ($pay_for_this_month < 0.01) {
-                    continue;
+                    break;
                 }
                 
                 $allocated_amount -= $pay_for_this_month;
@@ -343,6 +352,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
                 
                 $inserted_records++;
                 $months_paid_names[] = date('F Y', strtotime($unpaid_m . '-01'));
+                
+                $current_m_ts = strtotime("+1 month", strtotime($unpaid_m . '-01'));
             }
 
             // Update remaining loan balance in database
